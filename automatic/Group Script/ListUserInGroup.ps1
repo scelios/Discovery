@@ -12,10 +12,23 @@ The name of the group whose members will be listed.
 ListUserInGroup.ps1 -GroupName "HR Team"
 #>
 
-param (
-    [Parameter(Mandatory = $true)]
-    [string]$GroupName
-)
+Add-Type -AssemblyName Microsoft.VisualBasic
+
+# Function to display a pop-up and get user input
+function Get-UserInput {
+    param (
+        [string]$Message,
+        [string]$Title
+    )
+    [Microsoft.VisualBasic.Interaction]::InputBox($Message, $Title, "")
+}
+
+# Prompt the user for the group name
+$GroupName = Get-UserInput -Message "Enter the name of the group whose members you want to list (e.g., HR Team):" -Title "Group Name"
+if (-not $GroupName) {
+    Write-Host "No group name provided. Exiting..."
+    exit
+}
 
 # Retrieve the list of users in the group
 Write-Host "Retrieving members of group '$GroupName'..."

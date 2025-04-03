@@ -1,22 +1,25 @@
 <#
 .SYNOPSIS
 Resets the password of the specified Active Directory user.
-
-.DESCRIPTION
-This script resets the password of a specified Active Directory user. The new password
-is securely set and requires the user to change it at the next login.
-
-.PARAMETER AccountName
-The account name (SamAccountName) of the user whose password will be reset.
-
-.EXAMPLE
-ResetUserPassword.ps1 -AccountName "john.doe"
 #>
 
-param (
-    [Parameter(Mandatory = $true)]
-    [string]$AccountName
-)
+Add-Type -AssemblyName Microsoft.VisualBasic
+
+# Function to display a pop-up and get user input
+function Get-UserInput {
+    param (
+        [string]$Message,
+        [string]$Title
+    )
+    [Microsoft.VisualBasic.Interaction]::InputBox($Message, $Title, "")
+}
+
+# Prompt the user for the account name
+$AccountName = Get-UserInput -Message "Enter the account name (SamAccountName) of the user whose password will be reset (e.g., john.doe):" -Title "Account Name"
+if (-not $AccountName) {
+    Write-Host "No account name provided. Exiting..."
+    exit
+}
 
 # Define the new password securely
 $NewPassword = ConvertTo-SecureString "N3wP@ssw0rd!" -AsPlainText -Force # Replace with a secure password

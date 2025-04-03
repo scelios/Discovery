@@ -15,13 +15,27 @@ The name of the group from which the user will be removed.
 RemoveUserToGroup.ps1 -UserName "jdoe" -GroupName "HR Team"
 #>
 
-param (
-    [Parameter(Mandatory = $true)]
-    [string]$UserName,
+function Get-UserInput {
+    param (
+        [string]$Message,
+        [string]$Title
+    )
+    [Microsoft.VisualBasic.Interaction]::InputBox($Message, $Title, "")
+}
 
-    [Parameter(Mandatory = $true)]
-    [string]$GroupName
-)
+# Prompt the user for the username
+$UserName = Get-UserInput -Message "Enter the username (SamAccountName) of the user to remove from the group (e.g., jdoe):" -Title "User Name"
+if (-not $UserName) {
+    Write-Host "No username provided. Exiting..."
+    exit
+}
+
+# Prompt the user for the group name
+$GroupName = Get-UserInput -Message "Enter the name of the group from which the user will be removed (e.g., HR Team):" -Title "Group Name"
+if (-not $GroupName) {
+    Write-Host "No group name provided. Exiting..."
+    exit
+}
 
 # Remove the user from the group
 Write-Host "Removing user '$UserName' from group '$GroupName'..."

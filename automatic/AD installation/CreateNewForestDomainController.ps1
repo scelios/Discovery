@@ -12,16 +12,33 @@ The fully qualified domain name (FQDN) for the new forest (e.g., example.com).
 The NetBIOS name for the new forest (e.g., EXAMPLE).
 
 .EXAMPLE
-CreateNewForestDomainController.ps1 -DomainAddress "example.com" -NetbiosName "EXAMPLE"
+CreateNewForestDomainController.ps1
 #>
 
-param (
-    [Parameter(Mandatory = $true)]
-    [string]$DomainAddress,
+Add-Type -AssemblyName Microsoft.VisualBasic
 
-    [Parameter(Mandatory = $true)]
-    [string]$NetbiosName
-)
+# Function to display a pop-up and get user input
+function Get-UserInput {
+    param (
+        [string]$Message,
+        [string]$Title
+    )
+    [Microsoft.VisualBasic.Interaction]::InputBox($Message, $Title, "")
+}
+
+# Prompt the user for the Domain Address
+$DomainAddress = Get-UserInput -Message "Enter the fully qualified domain name (FQDN) for the new forest (e.g., example.com):" -Title "Domain Address"
+if (-not $DomainAddress) {
+    Write-Host "No Domain Address provided. Exiting..."
+    exit
+}
+
+# Prompt the user for the NetBIOS Name
+$NetbiosName = Get-UserInput -Message "Enter the NetBIOS name for the new forest (e.g., EXAMPLE):" -Title "NetBIOS Name"
+if (-not $NetbiosName) {
+    Write-Host "No NetBIOS Name provided. Exiting..."
+    exit
+}
 
 
 # Set the IP address and DNS server for the Ethernet interface

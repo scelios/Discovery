@@ -12,10 +12,22 @@ The attributes to retrieve for all users.
 ReadDataBaseInformation.ps1 -Attributes "Title", "Department"
 #>
 
-param (
-    [Parameter(Mandatory = $true)]
-    [string[]]$Attributes
-)
+function Get-UserInput {
+    param (
+        [string]$Message,
+        [string]$Title
+    )
+    [Microsoft.VisualBasic.Interaction]::InputBox($Message, $Title, "")
+}
+
+# Prompt the user for the attributes to retrieve
+$AttributesInput = Get-UserInput -Message "Enter the attributes to retrieve for all users (comma-separated, e.g., Title,Department), or leave blank to retrieve all properties:" -Title "Attributes"
+if (-not $AttributesInput) {
+    Write-Host "No attributes provided. Retrieving all properties..."
+    $Attributes = "*"
+} else {
+    $Attributes = $AttributesInput -split ","
+}
 
 # Retrieve all users' information
 Write-Host "Retrieving information for all users..."

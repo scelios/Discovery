@@ -7,29 +7,42 @@ This script retrieves all users and groups from the Active Directory Domain Cont
 and saves the data into a CSV file. The user can specify the file path, delimiter, and
 additional properties to include in the database.
 
-.PARAMETER FilePath
-The path where the resulting .CSV file will be saved.
-
-.PARAMETER Delimiter
-The delimiter to use in the CSV file (e.g., ',' for comma, ';' for semicolon).
-
-.PARAMETER Properties
-An undefined number of additional properties to include in the database.
-
 .EXAMPLE
-SaveDataBase.ps1 -FilePath "C:\ADData.csv" -Delimiter ',' -Properties "Name", "EmailAddress", "MemberOf"
+SaveDataBase.ps1
 #>
 
-param (
-    [Parameter(Mandatory = $true)]
-    [string]$FilePath,
+Add-Type -AssemblyName Microsoft.VisualBasic
 
-    [Parameter(Mandatory = $true)]
-    [string]$Delimiter,
+# Function to display a pop-up and get user input
+function Get-UserInput {
+    param (
+        [string]$Message,
+        [string]$Title
+    )
+    [Microsoft.VisualBasic.Interaction]::InputBox($Message, $Title, "")
+}
 
-    [Parameter(Mandatory = $false)]
-    [string[]]$Properties
-)
+# Prompt the user for the file path
+$FilePath = Get-UserInput -Message "Enter the full path where the CSV file will be saved (e.g., C:\ADData.csv):" -Title "CSV File Path"
+if (-not $FilePath) {
+    Write-Host "No file path provided. Exiting..."
+    exit
+}
+
+# Prompt the user for the delimiter
+$Delimiter = Get-UserInput -Message "Enter the delimiter to use in the CSV file (e.g., ',' for comma, ';' for semicolon):" -Title "CSV Delimiter"
+if (-not $Delimiter) {
+    Write-Host "No delimiter provided. Exiting..."
+    exit
+}
+
+# Prompt the user for additional properties (optional)
+$PropertiesInput = Get-UserInput -Message "Enter additional properties to include (comma-separated, e.g., Name,EmailAddress,MemberOf), or leave blank for defaults:" -Title "Additional Properties"
+if ($PropertiesInput) {
+    $Properties = $PropertiesInput -split ","
+} else {
+    $Properties = @()
+}
 
 # Default properties to include in the database
 $DefaultProperties = @("SamAccountName", "Name", "DistinguishedName", "ObjectClass")

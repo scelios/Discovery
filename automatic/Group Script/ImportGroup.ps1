@@ -12,17 +12,32 @@ The name of the group whose members will be imported.
 The name of the group to which the members will be added.
 
 .EXAMPLE
-ImportGroup.ps1 -OriginGroupName "HR Team" -DestinationGroupName "All Employees"
+ImportGroup.ps1
 #>
 
-param (
-    [Parameter(Mandatory = $true)]
-    [string]$OriginGroupName,
+Add-Type -AssemblyName Microsoft.VisualBasic
 
-    [Parameter(Mandatory = $true)]
-    [string]$DestinationGroupName
-)
+# Function to display a pop-up and get user input
+function Get-UserInput {
+    param (
+        [string]$Message,
+        [string]$Title
+    )
+    [Microsoft.VisualBasic.Interaction]::InputBox($Message, $Title, "")
+}
+# Prompt the user for the origin group name
+$OriginGroupName = Get-UserInput -Message "Enter the name of the origin group (e.g., HR Team):" -Title "Origin Group Name"
+if (-not $OriginGroupName) {
+    Write-Host "No origin group name provided. Exiting..."
+    exit
+}
 
+# Prompt the user for the destination group name
+$DestinationGroupName = Get-UserInput -Message "Enter the name of the destination group (e.g., All Employees):" -Title "Destination Group Name"
+if (-not $DestinationGroupName) {
+    Write-Host "No destination group name provided. Exiting..."
+    exit
+}
 # Import members from one group to another
 Write-Host "Importing members from group '$OriginGroupName' to group '$DestinationGroupName'..."
 try {

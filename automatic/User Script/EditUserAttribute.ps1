@@ -19,16 +19,34 @@ The new value to set for the specified attribute.
 EditUserAttribute.ps1 -AccountName "john.doe" -AttributeName "Title" -DesiredValue "Manager"
 #>
 
-param (
-    [Parameter(Mandatory = $true)]
-    [string]$AccountName,
+function Get-UserInput {
+    param (
+        [string]$Message,
+        [string]$Title
+    )
+    [Microsoft.VisualBasic.Interaction]::InputBox($Message, $Title, "")
+}
 
-    [Parameter(Mandatory = $true)]
-    [string]$AttributeName,
+# Prompt the user for the account name
+$AccountName = Get-UserInput -Message "Enter the account name (SamAccountName) of the user whose attribute will be modified (e.g., john.doe):" -Title "Account Name"
+if (-not $AccountName) {
+    Write-Host "No account name provided. Exiting..."
+    exit
+}
 
-    [Parameter(Mandatory = $true)]
-    [string]$DesiredValue
-)
+# Prompt the user for the attribute name
+$AttributeName = Get-UserInput -Message "Enter the name of the attribute to modify (e.g., Title):" -Title "Attribute Name"
+if (-not $AttributeName) {
+    Write-Host "No attribute name provided. Exiting..."
+    exit
+}
+
+# Prompt the user for the desired value
+$DesiredValue = Get-UserInput -Message "Enter the new value for the attribute (e.g., Manager):" -Title "Desired Value"
+if (-not $DesiredValue) {
+    Write-Host "No desired value provided. Exiting..."
+    exit
+}
 
 # Modify the user's attribute
 Write-Host "Modifying attribute '$AttributeName' for user: $AccountName..."

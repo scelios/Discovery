@@ -2,28 +2,44 @@
 .SYNOPSIS
 Changes the server's Name and IP address to match an existing domain.
 
-
-.PARAMETER Name
-The new name for the server (e.g., NewServerName).
-.PARAMETER ServerIP
-The new IPAdress of the server.
-.PARAMETER DomainIP
-New preferred Dns of the server.
+.DESCRIPTION
+This script renames the server and configures its IP address and DNS settings.
 
 .EXAMPLE
-RenamePCAndChangeIP.ps1 -Name "Script2" -ServerIP "192.168.1.11" -DomainIP "192.168.1.10"
+RenamePCAndChangeIP.ps1
 #>
 
-param (
-    [Parameter(Mandatory = $true)]
-    [string]$Name,
+Add-Type -AssemblyName Microsoft.VisualBasic
 
-    [Parameter(Mandatory = $true)]
-    [string]$ServerIP,
+# Function to display a pop-up and get user input
+function Get-UserInput {
+    param (
+        [string]$Message,
+        [string]$Title
+    )
+    [Microsoft.VisualBasic.Interaction]::InputBox($Message, $Title, "")
+}
 
-    [Parameter(Mandatory = $true)]
-    [string]$DomainIP
-)
+# Prompt the user for the new server name
+$Name = Get-UserInput -Message "Enter the new name for the server (e.g., NewServerName):" -Title "Server Name"
+if (-not $Name) {
+    Write-Host "No server name provided. Exiting..."
+    exit
+}
+
+# Prompt the user for the new server IP address
+$ServerIP = Get-UserInput -Message "Enter the new IP address for the server (e.g., 192.168.1.11):" -Title "Server IP Address"
+if (-not $ServerIP) {
+    Write-Host "No server IP address provided. Exiting..."
+    exit
+}
+
+# Prompt the user for the preferred DNS server IP address
+$DomainIP = Get-UserInput -Message "Enter the preferred DNS server IP address (e.g., 192.168.1.10):" -Title "DNS Server IP Address"
+if (-not $DomainIP) {
+    Write-Host "No DNS server IP address provided. Exiting..."
+    exit
+}
 
 # Check if the server name is already set
 $currentName = (Get-ComputerInfo).CsName

@@ -7,23 +7,34 @@ This script reads a CSV file containing user and group data from Active Director
 and loads it into memory for further processing or analysis. The user can specify
 the file path and the delimiter used in the CSV file.
 
-.PARAMETER FilePath
-The path to the .CSV file to load.
-
-.PARAMETER Delimiter
-The delimiter used in the CSV file (e.g., ',' for comma, ';' for semicolon).
-
 .EXAMPLE
-LoadDataBase.ps1 -FilePath "C:\ADData.csv" -Delimiter ','
+LoadDataBase.ps1
 #>
 
-param (
-    [Parameter(Mandatory = $true)]
-    [string]$FilePath,
+Add-Type -AssemblyName Microsoft.VisualBasic
 
-    [Parameter(Mandatory = $true)]
-    [string]$Delimiter
-)
+# Function to display a pop-up and get user input
+function Get-UserInput {
+    param (
+        [string]$Message,
+        [string]$Title
+    )
+    [Microsoft.VisualBasic.Interaction]::InputBox($Message, $Title, "")
+}
+
+# Prompt the user for the file path
+$FilePath = Get-UserInput -Message "Enter the full path to the CSV file (e.g., C:\ADData.csv):" -Title "CSV File Path"
+if (-not $FilePath) {
+    Write-Host "No file path provided. Exiting..."
+    exit
+}
+
+# Prompt the user for the delimiter
+$Delimiter = Get-UserInput -Message "Enter the delimiter used in the CSV file (e.g., ',' for comma, ';' for semicolon):" -Title "CSV Delimiter"
+if (-not $Delimiter) {
+    Write-Host "No delimiter provided. Exiting..."
+    exit
+}
 
 # Check if the file exists
 if (-not (Test-Path -Path $FilePath)) {

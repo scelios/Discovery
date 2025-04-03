@@ -15,19 +15,38 @@ The attribute of the group to edit.
 The new value to set for the specified attribute.
 
 .EXAMPLE
-ModifyGroup.ps1 -GroupName "HR Team" -Attribute "Description" -NewValue "Updated description for HR team"
+ModifyGroup.ps1
 #>
 
-param (
-    [Parameter(Mandatory = $true)]
-    [string]$GroupName,
 
-    [Parameter(Mandatory = $true)]
-    [string]$Attribute,
+function Get-UserInput {
+    param (
+        [string]$Message,
+        [string]$Title
+    )
+    [Microsoft.VisualBasic.Interaction]::InputBox($Message, $Title, "")
+}
 
-    [Parameter(Mandatory = $true)]
-    [string]$NewValue
-)
+# Prompt the user for the group name
+$GroupName = Get-UserInput -Message "Enter the name of the group to modify (e.g., HR Team):" -Title "Group Name"
+if (-not $GroupName) {
+    Write-Host "No group name provided. Exiting..."
+    exit
+}
+
+# Prompt the user for the attribute to modify
+$Attribute = Get-UserInput -Message "Enter the attribute of the group to modify (e.g., Description):" -Title "Group Attribute"
+if (-not $Attribute) {
+    Write-Host "No attribute provided. Exiting..."
+    exit
+}
+
+# Prompt the user for the new value of the attribute
+$NewValue = Get-UserInput -Message "Enter the new value for the attribute (e.g., Updated description for HR team):" -Title "New Value"
+if (-not $NewValue) {
+    Write-Host "No new value provided. Exiting..."
+    exit
+}
 
 # Modify the group attribute
 Write-Host "Modifying group '$GroupName'..."

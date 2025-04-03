@@ -15,16 +15,27 @@ The name of the group whose information will be retrieved.
 ReadGroupInformation.ps1 -GroupName "HR Team"
 
 .EXAMPLE
-ReadGroupInformation.ps1 -GroupName "HR Team" -PropertyName "Description"
+ReadGroupInformation.ps1
 #>
 
-param (
-    [Parameter(Mandatory = $true)]
-    [string]$GroupName,
 
-    [Parameter(Mandatory = $false)]
-    [string]$PropertyName
-)
+function Get-UserInput {
+    param (
+        [string]$Message,
+        [string]$Title
+    )
+    [Microsoft.VisualBasic.Interaction]::InputBox($Message, $Title, "")
+}
+
+# Prompt the user for the group name
+$GroupName = Get-UserInput -Message "Enter the name of the group whose information you want to retrieve (e.g., HR Team):" -Title "Group Name"
+if (-not $GroupName) {
+    Write-Host "No group name provided. Exiting..."
+    exit
+}
+
+# Prompt the user for the property name (optional)
+$PropertyName = Get-UserInput -Message "Enter the property name to retrieve for the group (e.g., Description), or leave blank to retrieve all properties:" -Title "Property Name"
 
 # Retrieve group information
 Write-Host "Retrieving information for group '$GroupName'..."

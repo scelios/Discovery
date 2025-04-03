@@ -16,13 +16,29 @@ An optional list of attributes to retrieve. If not specified, all attributes wil
 ReadUserInformation.ps1 -AccountName "john.doe" -Attributes "Title", "Department"
 #>
 
-param (
-    [Parameter(Mandatory = $true)]
-    [string]$AccountName,
+function Get-UserInput {
+    param (
+        [string]$Message,
+        [string]$Title
+    )
+    [Microsoft.VisualBasic.Interaction]::InputBox($Message, $Title, "")
+}
 
-    [Parameter(Mandatory = $false)]
-    [string[]]$Attributes
-)
+# Prompt the user for the account name
+$AccountName = Get-UserInput -Message "Enter the account name (SamAccountName) of the user whose information you want to retrieve (e.g., john.doe):" -Title "Account Name"
+if (-not $AccountName) {
+    Write-Host "No account name provided. Exiting..."
+    exit
+}
+
+# Prompt the user for the attributes to retrieve (optional)
+$AttributesInput = Get-UserInput -Message "Enter the attributes to retrieve for the user (comma-separated, e.g., Title,Department), or leave blank to retrieve all properties:" -Title "Attributes"
+if (-not $AttributesInput) {
+    Write-Host "No attributes provided. Retrieving all properties..."
+    $Attributes = "*"
+} else {
+    $Attributes = $AttributesInput -split ","
+}
 
 # Retrieve user information
 Write-Host "Retrieving information for user: $AccountName..."

@@ -12,13 +12,20 @@ This script retrieves information from every group in the domain. If no property
 ReadEveryGroupInformation.ps1
 
 .EXAMPLE
-ReadEveryGroupInformation.ps1 -PropertyName "Description"
+ReadEveryGroupInformation.ps1
 #>
 
-param (
-    [Parameter(Mandatory = $false)]
-    [string]$PropertyName
-)
+
+function Get-UserInput {
+    param (
+        [string]$Message,
+        [string]$Title
+    )
+    [Microsoft.VisualBasic.Interaction]::InputBox($Message, $Title, "")
+}
+
+# Prompt the user for the property name (optional)
+$PropertyName = Get-UserInput -Message "Enter the property name to retrieve for each group (e.g., Description), or leave blank to retrieve all properties:" -Title "Property Name"
 
 # Retrieve information for all groups
 Write-Host "Retrieving information for all groups in the domain..."
