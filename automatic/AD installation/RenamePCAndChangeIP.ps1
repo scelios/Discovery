@@ -25,21 +25,38 @@ param (
     [string]$DomainIP
 )
 
-# Set the new name for the server
-Rename-Computer -NewName $Name -Force
-Write-Host "Server renamed successfully to: $Name"
+# Check if the server name is already set
+$currentName = (Get-ComputerInfo).CsName
+if ($currentName -eq $Name) {
+    Write-Host "The server name is already set to: $Name"
+} else {
+    # Set the new name for the server
+    Rename-Computer -NewName $Name -Force
+    Write-Host "The server has been successfully renamed to: $Name"
+}
 
 # Configure the server's IP address and DNS settings
 Write-Host "Configuring the server's IP address and DNS settings..."
-New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress $ServerIP -PrefixLength 24 -DefaultGateway $DomainIP
-Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses $DomainIP
 
+# Check if the IP address already exists
+$existingIP = Get-NetIPAddress -InterfaceAlias "Ethernet" -AddressFamily IPv4 | Where-Object { $_.IPAddress -eq $ServerIP }
 
+if ($existingIP) {
+    Write-Host "The IP address $ServerIP already exists. Updating settings..."
+    Set-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress $ServerIP -PrefixLength 24 -DefaultGateway $DomainIP
+} else {
+    Write-Host "Adding the new IP address $ServerIP..."
+    New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress $ServerIP -PrefixLength 24 -DefaultGateway $DomainIP
+}
 
-Write-Host "Server IP address set to: $ServerIP"
-Write-Host "Preferred DNS server set to: $DomainIP"
+# Check if the DNS server is already configured
+$currentDNS = (Get-DnsClientServerAddress -InterfaceAlias "Ethernet").ServerAddresses
+if ($currentDNS -contains $DomainIP) {
+    Write-Host "The DNS server is already set to: $DomainIP"
+} else {
+    Write-Host "Configuring the DNS server to: $DomainIP"
+    Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses $DomainIP
+}
 
-# Restart the server to apply the changes
-Write-Host "Restarting the server to apply the changes..."
-Restart-Computer -Force
-Write-Host "Server will restart now."
+Write-Host "The server's IP address is set to: $ServerIP"
+Write-Host "The preferred DNS server is set to: $DomainIP"
