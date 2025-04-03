@@ -11,7 +11,7 @@ It also configures the server's IP address and DNS settings based on the domain'
 The fully qualified domain name (FQDN) of the existing domain (e.g., example.com).
 
 .EXAMPLE
-Join-ExistingDomainController.ps1 -DomainAddress "example.com"
+JoinExistingDomainController.ps1 -DomainAddress "example.com"
 #>
 
 param (
@@ -21,13 +21,15 @@ param (
 
 
 # Define the Safe Mode Administrator Password
-$SafeModeAdminPassword = (ConvertTo-SecureString "Test2" -AsPlainText -Force) # Replace with a secure password
+$SafeModeAdminPassword = (ConvertTo-SecureString "Test123456789" -AsPlainText -Force) # Replace with a secure password
 
 # Promote the server to a domain controller by joining the existing domain
 Write-Host "Promoting the server to a Domain Controller for the existing domain..."
+$Credential = Get-Credential
 Install-ADDSDomainController `
     -DomainName $DomainAddress `
     -SafeModeAdministratorPassword $SafeModeAdminPassword `
+    -Credential $Credential `
     -InstallDNS `
     -Force
 

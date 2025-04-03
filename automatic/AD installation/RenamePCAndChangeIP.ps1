@@ -11,7 +11,7 @@ The new IPAdress of the server.
 New preferred Dns of the server.
 
 .EXAMPLE
-RenamePCAndChangeIP.ps1 -Name "NewserverName" -ServerIP "192.168.1.11" -DomainIP "192.168.1.10"
+RenamePCAndChangeIP.ps1 -Name "Script2" -ServerIP "192.168.1.11" -DomainIP "192.168.1.10"
 #>
 
 param (

@@ -12,7 +12,7 @@ The fully qualified domain name (FQDN) for the new forest (e.g., example.com).
 The NetBIOS name for the new forest (e.g., EXAMPLE).
 
 .EXAMPLE
-Promote-ToDomainController.ps1 -DomainAddress "example.com" -NetbiosName "EXAMPLE"
+CreateNewForestDomainController.ps1 -DomainAddress "example.com" -NetbiosName "EXAMPLE"
 #>
 
 param (
