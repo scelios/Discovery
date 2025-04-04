@@ -55,19 +55,17 @@ if (-not (Test-Path -Path $DirectoryPath)) {
     Write-Host "The specified directory does not exist. Please provide a valid path."
     exit
 }
-
+# Check if the file exists
+if (-not (Test-Path -Path $FilePath)) {
+    Write-Host "The file at path '$FilePath' does not exist. Please provide a valid path."
+    exit
+}
 
 # Prompt the user for the delimiter
 $Delimiter = Get-UserInput -Message "Enter the delimiter used in the CSV file (e.g., ',' for comma, ';' for semicolon):" -Title "CSV Delimiter"
 if (-not $Delimiter) {
     Write-Host "No delimiter provided. Exiting..."
     exit
-}
-
-# Check if the file exists
-if (-not (Test-Path -Path $FilePath)) {
-    Write-Error "The file at path '$FilePath' does not exist."
-    return
 }
 
 # Load the CSV file
