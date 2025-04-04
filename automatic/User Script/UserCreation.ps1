@@ -88,8 +88,13 @@ if (Get-ADUser -Filter { SamAccountName -eq $AccountName }) {
 # Check if the OU exists
 if (-not (Get-ADOrganizationalUnit -Filter { DistinguishedName -eq $OrganisationUnit })) {
     # Create the OU if it doesn't exist
-    Write-Host "Organizational Unit $OrganisationUnit does not exist. Creating it..."
-    New-ADOrganizationalUnit -Name $OrganisationUnit -Path "DC=example,DC=com" # Replace with your actual domain
+    try {
+        Write-Host "Organizational Unit $OrganisationUnit does not exist. Creating it..."
+        New-ADOrganizationalUnit -Name $OrganisationUnit -Path "DC=example,DC=com" # Replace with your actual domain
+    } catch {
+        Write-Error "Failed to create Organizational Unit $OrganisationUnit. Error: $_"
+        exit
+    }
     Write-Host "Organizational Unit $OrganisationUnit created successfully."
 }
 
@@ -97,7 +102,13 @@ if (-not (Get-ADOrganizationalUnit -Filter { DistinguishedName -eq $Organisation
 if (-not (Get-ADGroup -Filter { Name -eq $DesiredGroup })) {
     # Create the group if it doesn't exist
     Write-Host "Group $DesiredGroup does not exist. Creating it..."
-    New-ADGroup -Name $DesiredGroup -Path $OrganisationUnit -GroupScope Global -GroupCategory Security
+    try {
+        # Create the group with default parameters
+        New-ADGroup -Name $DesiredGroup -Path $OrganisationUnit -GroupScope Global -GroupCategory Security
+    } catch {
+        Write-Error "Failed to create group $DesiredGroup. Error: $_"
+        exit
+    }
     Write-Host "Group $DesiredGroup created successfully."
 }
 
