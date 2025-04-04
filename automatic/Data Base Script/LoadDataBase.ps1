@@ -61,6 +61,12 @@ if (-not (Test-Path -Path $FilePath)) {
     exit
 }
 
+# Check if it is a file
+if (-not (Get-Item -Path $FilePath).PSIsContainer) {
+    Write-Host "The path '$FilePath' is not a file. Please provide a valid file path."
+    exit
+}
+
 # Check if the file is readable
 if (-not (Get-Item -Path $FilePath).Attributes -match "ReadOnly") {
     Write-Host "The file at path '$FilePath' is not readable. Please check the file permissions."
