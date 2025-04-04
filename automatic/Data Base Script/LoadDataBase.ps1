@@ -23,11 +23,39 @@ function Get-UserInput {
 }
 
 # Prompt the user for the file path
-$FilePath = Get-UserInput -Message "Enter the full path to the CSV file (e.g., C:\ADData.csv):" -Title "CSV File Path"
+# Put the current path in the input box
+$CurrentPath = Get-Location
+$DefaultFilePath = Join-Path -Path $CurrentPath.Path -ChildPath "ADData.csv"
+
+# Prompt the user for the file path with the current path as the default value
+$FilePath = [Microsoft.VisualBasic.Interaction]::InputBox(
+    "Enter the full path where the CSV file will be saved (e.g., C:\ADData.csv):",
+    "CSV File Path",
+    $DefaultFilePath
+)
+
+if (-not (Get-Command Get-ADGroup -ErrorAction SilentlyContinue)) {
+    Write-Host "The Active Directory module is not available. Please install it to run this script."
+    exit
+}
+
 if (-not $FilePath) {
     Write-Host "No file path provided. Exiting..."
     exit
 }
+
+# Check if the directory path is valid
+$DirectoryPath = Split-Path -Path $FilePath -Parent
+if (-not (Test-Path -Path $DirectoryPath)) {
+    Write-Host "The specified directory does not exist. Please provide a valid path."
+    exit
+}
+# Check if the file path is writable
+if (-not (Test-Path -Path $DirectoryPath)) {
+    Write-Host "The specified directory does not exist. Please provide a valid path."
+    exit
+}
+
 
 # Prompt the user for the delimiter
 $Delimiter = Get-UserInput -Message "Enter the delimiter used in the CSV file (e.g., ',' for comma, ';' for semicolon):" -Title "CSV Delimiter"
@@ -55,6 +83,3 @@ try {
 # Output the loaded data
 Write-Host "Displaying the first 10 entries in the database:"
 $Database | Select-Object -First 10 | Format-Table -AutoSize
-
-# Return the database object for further use
-return $Database

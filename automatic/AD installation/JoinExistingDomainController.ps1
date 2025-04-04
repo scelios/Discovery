@@ -35,18 +35,24 @@ if (-not $DomainAddress) {
 # Define the Safe Mode Administrator Password
 $SafeModeAdminPassword = (ConvertTo-SecureString "Test123456789" -AsPlainText -Force) # Replace with a secure password
 
-# Prompt the user for credentials
-Write-Host "Please provide credentials for the domain."
-$Credential = Get-Credential
 
-# Promote the server to a domain controller by joining the existing domain
-Write-Host "Promoting the server to a Domain Controller for the existing domain..."
-Install-ADDSDomainController `
-    -DomainName $DomainAddress `
-    -SafeModeAdministratorPassword $SafeModeAdminPassword `
-    -Credential $Credential `
-    -InstallDNS `
-    -Force
+try {
+    # Prompt the user for credentials
+    Write-Host "Please provide credentials for the domain."
+    $Credential = Get-Credential
 
+    # Promote the server to a domain controller by joining the existing domain
+    Write-Host "Promoting the server to a Domain Controller for the existing domain..."
+    Install-ADDSDomainController `
+        -DomainName $DomainAddress `
+        -SafeModeAdministratorPassword $SafeModeAdminPassword `
+        -Credential $Credential `
+        -InstallDNS `
+        -Force
+} catch {
+    Write-Host "An error occurred while promoting the server to a Domain Controller: $_"
+    exit
+}
 # Notify the user that the process is complete
-Write-Host "The server has been successfully promoted to a Domain Controller for the existing domain."
+Write-Host "The server has been successfully promoted to a Domain Controller for the existing domain.\
+\nPlease restart the server to complete the installation."

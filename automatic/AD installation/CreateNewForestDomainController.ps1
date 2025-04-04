@@ -42,27 +42,36 @@ if (-not $NetbiosName) {
 
 
 # Set the IP address and DNS server for the Ethernet interface
-Write-Host "Configuring IP address and DNS settings..."
-New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress 192.168.1.10 -PrefixLength 24 -DefaultGateway 192.168.1.1
-Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses 192.168.1.10
+try {
+    Write-Host "Configuring IP address and DNS settings..."
+    New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress 192.168.1.10 -PrefixLength 24 -DefaultGateway 192.168.1.1
+    Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses 192.168.1.10
 
-# Verify the IP address and DNS settings
-Write-Host "Verifying IP address and DNS settings..."
-Get-NetIPAddress -InterfaceAlias "Ethernet"
-Get-DnsClientServerAddress -InterfaceAlias "Ethernet"
-Write-Host "IP address and DNS settings configured successfully."
+    # Verify the IP address and DNS settings
+    Write-Host "Verifying IP address and DNS settings..."
+    Get-NetIPAddress -InterfaceAlias "Ethernet"
+    Get-DnsClientServerAddress -InterfaceAlias "Ethernet"
+    Write-Host "IP address and DNS settings configured successfully."
+} catch {
+    Write-Host "An error occurred while configuring the IP address and DNS settings: $_"
+    exit
+}
 
-# Define the Safe Mode Administrator Password
-$SafeModeAdminPassword = (ConvertTo-SecureString "Test2" -AsPlainText -Force) # Replace with a secure password
-
-# Promote the server to a domain controller
-Write-Host "Promoting the server to a Domain Controller for the new forest..."
-Install-ADDSForest `
-    -DomainName $DomainAddress `
-    -DomainNetbiosName $NetbiosName `
-    -SafeModeAdministratorPassword $SafeModeAdminPassword `
-    -InstallDNS `
-    -Force
-
+    # Define the Safe Mode Administrator Password
+    $SafeModeAdminPassword = (ConvertTo-SecureString "Test2" -AsPlainText -Force) # Replace with a secure password
+Try{
+    # Promote the server to a domain controller
+    Write-Host "Promoting the server to a Domain Controller for the new forest..."
+    Install-ADDSForest `
+        -DomainName $DomainAddress `
+        -DomainNetbiosName $NetbiosName `
+        -SafeModeAdministratorPassword $SafeModeAdminPassword `
+        -InstallDNS `
+        -Force
+} catch {
+    Write-Host "An error occurred while promoting the server to a Domain Controller: $_"
+    exit
+}
 # Notify the user that the process is complete
-Write-Host "The server has been successfully promoted to a Domain Controller for the new forest."
+Write-Host "The server has been successfully promoted to a Domain Controller for the new forest.\
+\nPlease restart the server to complete the installation."
