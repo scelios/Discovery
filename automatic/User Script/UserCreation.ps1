@@ -61,6 +61,16 @@ if ($NameParts.Count -ne 2) {
 $FirstName = $NameParts[0]
 $LastName = $NameParts[1]
 
+# Validate FirstName and LastName
+if ($FirstName -match '[\\/:*?"<>|]' -or $LastName -match '[\\/:*?"<>|]') {
+    Write-Error "FirstName or LastName contains invalid characters. Please use valid characters."
+    exit
+}
+
+# Trim spaces from FirstName and LastName
+$FirstName = $FirstName.Trim()
+$LastName = $LastName.Trim()
+
 # Construct the email address and UserPrincipalName
 $DomainName = "example.com" # Replace with your actual domain name
 $EmailAddress = "$AccountName@$DomainName"
