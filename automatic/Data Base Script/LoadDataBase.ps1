@@ -61,6 +61,13 @@ if (-not (Test-Path -Path $FilePath)) {
     exit
 }
 
+# Check if the file is readable
+if (-not (Get-Item -Path $FilePath).Attributes -match "ReadOnly") {
+    Write-Host "The file at path '$FilePath' is not readable. Please check the file permissions."
+    exit
+}
+
+
 # Prompt the user for the delimiter
 $Delimiter = Get-UserInput -Message "Enter the delimiter used in the CSV file (e.g., ',' for comma, ';' for semicolon):" -Title "CSV Delimiter"
 if (-not $Delimiter) {
@@ -73,11 +80,11 @@ Write-Host "Loading the database from $FilePath with delimiter '$Delimiter'..."
 try {
     $Database = Import-Csv -Path $FilePath -Delimiter $Delimiter
     Write-Host "Database successfully loaded."
+    # Output the loaded data
+    Write-Host "Displaying the first 10 entries in the database:"
+    $Database | Select-Object -First 10 | Format-Table -AutoSize
 } catch {
     Write-Error "Failed to load the database. Error: $_"
     return
 }
 
-# Output the loaded data
-Write-Host "Displaying the first 10 entries in the database:"
-$Database | Select-Object -First 10 | Format-Table -AutoSize
