@@ -69,23 +69,49 @@ $UserPrincipalName = $EmailAddress
 # Securely define the default password
 $DefaultPassword = ConvertTo-SecureString "TotalyN0tSecure" -AsPlainText -Force
 
-# Create the new user
-Write-Host "Creating user: $AccountName in OU: $OrganisationUnit..."
-New-ADUser `
-    -Name "$FirstName $LastName" `
-    -GivenName $FirstName `
-    -Surname $LastName `
-    -SamAccountName $AccountName `
-    -UserPrincipalName $UserPrincipalName `
-    -EmailAddress $EmailAddress `
-    -Path $OrganisationUnit `
-    -AccountPassword $DefaultPassword `
-    -ChangePasswordAtLogon $true `
-    -Enabled $true
+# Check if the user already exists
+if (Get-ADUser -Filter { SamAccountName -eq $AccountName }) {
+    Write-Host "User $AccountName already exists. Exiting..."
+    exit
+}
 
-Write-Host "User $AccountName created successfully."
+# Check if the OU exists
+if (-not (Get-ADOrganizationalUnit -Filter { DistinguishedName -eq $OrganisationUnit })) {
+    # Create the OU if it doesn't exist
+    Write-Host "Organizational Unit $OrganisationUnit does not exist. Creating it..."
+    New-ADOrganizationalUnit -Name $OrganisationUnit -Path "DC=example,DC=com" # Replace with your actual domain
+    Write-Host "Organizational Unit $OrganisationUnit created successfully."
+}
 
-# Add the user to the desired group
-Write-Host "Adding user $AccountName to group: $DesiredGroup..."
-Add-ADGroupMember -Identity $DesiredGroup -Members $AccountName
-Write-Host "User $AccountName added to group $DesiredGroup successfully."
+# Check if the group exists
+if (-not (Get-ADGroup -Filter { Name -eq $DesiredGroup })) {
+    # Create the group if it doesn't exist
+    Write-Host "Group $DesiredGroup does not exist. Creating it..."
+    New-ADGroup -Name $DesiredGroup -Path $OrganisationUnit -GroupScope Global -GroupCategory Security
+    Write-Host "Group $DesiredGroup created successfully."
+}
+
+try {
+    # Create the new user
+    Write-Host "Creating user: $AccountName in OU: $OrganisationUnit..."
+    New-ADUser `
+        -Name "$FirstName $LastName" `
+        -GivenName $FirstName `
+        -Surname $LastName `
+        -SamAccountName $AccountName `
+        -UserPrincipalName $UserPrincipalName `
+        -EmailAddress $EmailAddress `
+        -Path $OrganisationUnit `
+        -AccountPassword $DefaultPassword `
+        -ChangePasswordAtLogon $true `
+        -Enabled $true
+
+    Write-Host "User $AccountName created successfully."
+
+    # Add the user to the desired group
+    Write-Host "Adding user $AccountName to group: $DesiredGroup..."
+    Add-ADGroupMember -Identity $DesiredGroup -Members $AccountName
+    Write-Host "User $AccountName added to group $DesiredGroup successfully."
+} catch {
+    Write-Error "Failed to create user or add to group. Error: $_"
+}

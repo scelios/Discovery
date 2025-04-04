@@ -55,5 +55,5 @@ try {
         $UserInfo | Format-List
     }
 } catch {
-    Write-Error "Failed to retrieve information for user: $Account# filepath: /home/hall/Discovery/automatic/User Script/ReadUserInformation.ps1
-
+    Write-Error "Failed to retrieve information for user: $AccountName. Error: $_"
+}

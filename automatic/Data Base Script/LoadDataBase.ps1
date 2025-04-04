@@ -61,9 +61,9 @@ if (-not (Test-Path -Path $FilePath)) {
     exit
 }
 
-# Check if it is a file
-if (-not (Get-Item -Path $FilePath).PSIsContainer) {
-    Write-Host "The path '$FilePath' is not a file. Please provide a valid file path."
+# Check if it is a file and not a directory
+if ((Get-Item -Path $FilePath).PSIsContainer) {
+    Write-Host "The path '$FilePath' is a directory, not a file. Please provide a valid file path."
     exit
 }
 
@@ -78,6 +78,12 @@ if (-not (Get-Item -Path $FilePath).Attributes -match "ReadOnly") {
 $Delimiter = Get-UserInput -Message "Enter the delimiter used in the CSV file (e.g., ',' for comma, ';' for semicolon):" -Title "CSV Delimiter"
 if (-not $Delimiter) {
     Write-Host "No delimiter provided. Exiting..."
+    exit
+}
+
+# Check user input
+if ($Delimiter -notmatch "^[,;]$") {
+    Write-Host "Invalid delimiter. Please use ',' for comma or ';' for semicolon."
     exit
 }
 
