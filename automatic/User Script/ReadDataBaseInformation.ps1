@@ -20,6 +20,20 @@ function Get-UserInput {
     [Microsoft.VisualBasic.Interaction]::InputBox($Message, $Title, "")
 }
 
+# Prompt the user for AccountName
+$AccountName = Get-UserInput -Message "Enter the account name (SamAccountName) of the user whose information you want to retrieve (e.g., john.doe):" -Title "Account Name"
+if (-not $AccountName) {
+    Write-Host "No account name provided. Retrieving information for all users..."
+    $AccountName = "*"
+}
+
+# Validate the account name format
+if ($AccountName -match '[\\/:?"<>|]') {
+    Write-Error "AccountName contains invalid characters. Please use valid characters."
+    exit
+}
+
+
 # Prompt the user for the attributes to retrieve
 $AttributesInput = Get-UserInput -Message "Enter the attributes to retrieve for all users (comma-separated, e.g., Title,Department), or leave blank to retrieve all properties:" -Title "Attributes"
 if (-not $AttributesInput) {
@@ -31,9 +45,19 @@ if (-not $AttributesInput) {
 
 # Retrieve all users' information
 Write-Host "Retrieving information for all users..."
+Write-Host "Account Name: $AccountName"
+Write-Host "Attributes: $Attributes"
 try {
-    $Users = Get-ADUser -Filter * -Properties $Attributes
-    $Users | Select-Object SamAccountName, @($Attributes) | Format-Table -AutoSize
+    if ($Attributes -eq "*" -and $AccountName -eq "*") {
+        # Retrieve all properties
+        $Users = Get-ADUser -Filter * -Properties * -ErrorAction Stop
+        $Users | Format-Table -AutoSize
+    } else {
+        # Ensure $Attributes is an array
+        $AttributesArray = $Attributes
+        $Users = Get-ADUser -Filter * -Properties $AttributesArray -ErrorAction Stop
+        $Users | Select-Object SamAccountName, $AttributesArray | Format-Table -AutoSize
+    }
 } catch {
     Write-Error "Failed to retrieve information for all users. Error: $_"
 }

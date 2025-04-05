@@ -68,10 +68,8 @@ Try{
         -SafeModeAdministratorPassword $SafeModeAdminPassword `
         -InstallDNS `
         -Force
+        # Notify the user that the process is complete
+    Write-Host "The server has been successfully promoted to a Domain Controller for the new forest.`nPlease restart the server to complete the installation."
 } catch {
     Write-Host "An error occurred while promoting the server to a Domain Controller: $_"
-    exit
 }
-# Notify the user that the process is complete
-Write-Host "The server has been successfully promoted to a Domain Controller for the new forest.\
-\nPlease restart the server to complete the installation."

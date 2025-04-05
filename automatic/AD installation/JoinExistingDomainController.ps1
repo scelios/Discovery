@@ -54,5 +54,4 @@ try {
     exit
 }
 # Notify the user that the process is complete
-Write-Host "The server has been successfully promoted to a Domain Controller for the existing domain.\
-\nPlease restart the server to complete the installation."
+Write-Host "The server has been successfully promoted to a Domain Controller for the existing domain.`nPlease restart the server to complete the installation."

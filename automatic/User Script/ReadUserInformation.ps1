@@ -26,32 +26,55 @@ function Get-UserInput {
 
 # Prompt the user for the account name
 $AccountName = Get-UserInput -Message "Enter the account name (SamAccountName) of the user whose information you want to retrieve (e.g., john.doe):" -Title "Account Name"
+
 if (-not $AccountName) {
     Write-Host "No account name provided. Exiting..."
     exit
 }
 
+# Validate the account name format
+if ($AccountName -match '[\\/:*?"<>|]') {
+    Write-Error "AccountName contains invalid characters. Please use valid characters."
+    exit
+}
+
+# Check if the account name exists in Active Directory
+try {
+    $User = Get-ADUser -Identity $AccountName -ErrorAction Stop
+} catch {
+    Write-Error "User with SamAccountName '$AccountName' does not exist in Active Directory."
+    exit
+}
+
 # Prompt the user for the attributes to retrieve (optional)
-$AttributesInput = Get-UserInput -Message "Enter the attributes to retrieve for the user (comma-separated, e.g., Title,Department), or leave blank to retrieve all properties:" -Title "Attributes"
+$AttributesInput = Get-UserInput -Message "Enter the attribute to retrieve for the user (e.g., Title,Department), or leave blank to retrieve all properties:" -Title "Attributes"
 if (-not $AttributesInput) {
     Write-Host "No attributes provided. Retrieving all properties..."
     $Attributes = "*"
 } else {
     $Attributes = $AttributesInput -split ","
 }
+# Validate the attributes
+foreach ($Attribute in $Attributes) {
+    if ($Attribute -match '[\\/:?"<>|]') {
+        Write-Error "Attribute '$Attribute' contains invalid characters. Please use valid characters."
+        exit
+    }
+}
 
 # Retrieve user information
 Write-Host "Retrieving information for user: $AccountName..."
 try {
-    if ($Attributes) {
-        # Retrieve only the specified attributes
+    if ($Attributes -ne "*") {
+        # Ensure no duplicate properties in the selection
+        $UniqueAttributes = $Attributes | Where-Object { $_ -ne "SamAccountName" }
         $UserInfo = Get-ADUser -Identity $AccountName -Properties $Attributes
-        Write-Host "Retrieved the following attributes for user $AccountName:"
-        $UserInfo | Select-Object SamAccountName, $Attributes | Format-Table -AutoSize
+        Write-Host "Retrieved the following attributes for user $AccountName :"
+        $UserInfo | Select-Object SamAccountName, $UniqueAttributes | Format-Table -AutoSize
     } else {
         # Retrieve all attributes
         $UserInfo = Get-ADUser -Identity $AccountName -Properties *
-        Write-Host "Retrieved all attributes for user $AccountName:"
+        Write-Host "Retrieved all attributes for user $AccountName :"
         $UserInfo | Format-List
     }
 } catch {
