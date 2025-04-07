@@ -83,7 +83,7 @@ if (Get-ADUser -Filter { SamAccountName -eq $AccountName }) {
 
 # Prompt the user for the organizational unit
 if (!$NoPopup) {
-    $OUname = Get-UserInput -Message "Enter the distinguished name (DN) of the Organizational Unit (OU) where the user will be created (e.g., OU=Users,DC=example,DC=com):" -Title "Organizational Unit"
+    $OUname = Get-UserInput -Message "Enter the distinguished name (DN) of the Organizational Unit (OU) where the user will be created (e.g., OU=Users):" -Title "Organizational Unit"
 }
 if (-not $OUname) {
     Write-Host "No organizational unit provided. Exiting..."
