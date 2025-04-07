@@ -17,6 +17,12 @@ CreateNewForestDomainController.ps1
 
 Add-Type -AssemblyName Microsoft.VisualBasic
 
+param(
+    [bool]$NoPopup = $false,
+    [string]$DomainAddress,
+    [string]$NetbiosName
+)
+
 # Function to display a pop-up and get user input
 function Get-UserInput {
     param (
@@ -25,16 +31,22 @@ function Get-UserInput {
     )
     [Microsoft.VisualBasic.Interaction]::InputBox($Message, $Title, "")
 }
+if (!$PSBoundParameters.ContainsKey('Subject') -or !$PSBoundParameters.ContainsKey('Marks')) {
 
 # Prompt the user for the Domain Address
-$DomainAddress = Get-UserInput -Message "Enter the fully qualified domain name (FQDN) for the new forest (e.g., example.com):" -Title "Domain Address"
+if (!$NoPopup) {
+    $DomainAddress = Get-UserInput -Message "Enter the fully qualified domain name (FQDN) for the new forest (e.g., example.com):" -Title "Domain Address"
+}
+
 if (-not $DomainAddress) {
     Write-Host "No Domain Address provided. Exiting..."
     exit
 }
 
 # Prompt the user for the NetBIOS Name
-$NetbiosName = Get-UserInput -Message "Enter the NetBIOS name for the new forest (e.g., EXAMPLE):" -Title "NetBIOS Name"
+if (!$NoPopup) {
+    $NetbiosName = Get-UserInput -Message "Enter the NetBIOS name for the new forest (e.g., EXAMPLE):" -Title "NetBIOS Name"
+}
 if (-not $NetbiosName) {
     Write-Host "No NetBIOS Name provided. Exiting..."
     exit
