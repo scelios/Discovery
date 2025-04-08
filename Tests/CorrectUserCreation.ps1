@@ -1,0 +1,2 @@
+& "C:\Users\Administrator\Downloads\Discovery\automatic\Group Script\CreateGroup.ps1" -NoPopup:$true -GroupName "IT" -GroupScope "DomainLocal" -OrganizationalUnit "OU=Groups,DC=domolia,DC=local" -Description "test"
+& "C:\Users\Administrator\Downloads\Discovery\automatic\User Script\UserCreation.ps1" -NoPopup:$true -AccountName "john.doe" -OUname "Users" -DesiredGroup "IT"
