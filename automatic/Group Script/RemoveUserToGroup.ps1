@@ -41,23 +41,24 @@ if (-not $GroupName) {
 Write-Host "Removing user '$UserName' from group '$GroupName'..."
 try {
     # Verify that the user exists
-    $User = Get-ADUser -Identity $UserName -ErrorAction Stop
+    $User = Get-ADUser -Filter "SamAccountName -eq '$($UserName)'" -ErrorAction Stop
     if (-not $User) {
-        Write-Error "User '$UserName' does not exist. Operation aborted."
+        Write-Host "User $($UserName) does not exists."
         return
     }
 
     # Verify that the group exists
-    $Group = Get-ADGroup -Identity $GroupName -ErrorAction Stop
+    $Group = Get-ADGroup -Filter "Name -eq '$($GroupName)'" -ErrorAction Stop
     if (-not $Group) {
-        Write-Error "Group '$GroupName' does not exist. Operation aborted."
+        Write-Host "Group $($GroupName) does not exists."
         return
     }
 
     # Verify that the user is a member of the group
-    $GroupMembers = Get-ADGroupMember -Identity $GroupName -ErrorAction Stop
-    if ($GroupMembers -notcontains $User.DistinguishedName) {
-        Write-Error "User '$UserName' is not a member of group '$GroupName'. Operation aborted."
+    $GroupMembers = Get-ADGroupMember -Identity $GroupName -ErrorAction Stop | Select-Object -ExpandProperty SamAccountName
+
+    if ($UserName -notin $GroupMembers) {
+        Write-Host "User '$UserName' is not a member of group '$GroupName'. Operation aborted."
         return
     }
 
@@ -65,5 +66,5 @@ try {
     Remove-ADGroupMember -Identity $GroupName -Members $UserName -Confirm:$false
     Write-Host "User '$UserName' successfully removed from group '$GroupName'."
 } catch {
-    Write-Error "Failed to remove user from the group. Error: $_"
+    Write-Host "Failed to remove user from the group. Error: $_"
 }

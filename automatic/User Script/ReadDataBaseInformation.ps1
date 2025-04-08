@@ -29,7 +29,7 @@ if (-not $AccountName) {
 
 # Validate the account name format
 if ($AccountName -match '[\\/:?"<>|]') {
-    Write-Error "AccountName contains invalid characters. Please use valid characters."
+    Write-Host "AccountName contains invalid characters. Please use valid characters."
     exit
 }
 
@@ -59,5 +59,5 @@ try {
         $Users | Select-Object SamAccountName, $AttributesArray | Format-Table -AutoSize
     }
 } catch {
-    Write-Error "Failed to retrieve information for all users. Error: $_"
+    Write-Host "Failed to retrieve information for all users. Error: $_"
 }

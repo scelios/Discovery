@@ -35,5 +35,5 @@ try {
     Set-ADUser -Identity $AccountName -ChangePasswordAtLogon $true
     Write-Host "User $AccountName is now required to change password at next login."
 } catch {
-    Write-Error "Failed to reset password for user: $AccountName. Error: $_"
+    Write-Host "Failed to reset password for user: $AccountName. Error: $_"
 }

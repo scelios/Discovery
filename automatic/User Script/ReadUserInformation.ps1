@@ -34,7 +34,7 @@ if (-not $AccountName) {
 
 # Validate the account name format
 if ($AccountName -match '[\\/:*?"<>|]') {
-    Write-Error "AccountName contains invalid characters. Please use valid characters."
+    Write-Host "AccountName contains invalid characters. Please use valid characters."
     exit
 }
 
@@ -42,7 +42,7 @@ if ($AccountName -match '[\\/:*?"<>|]') {
 try {
     $User = Get-ADUser -Identity $AccountName -ErrorAction Stop
 } catch {
-    Write-Error "User with SamAccountName '$AccountName' does not exist in Active Directory."
+    Write-Host "User with SamAccountName '$AccountName' does not exist in Active Directory."
     exit
 }
 
@@ -57,7 +57,7 @@ if (-not $AttributesInput) {
 # Validate the attributes
 foreach ($Attribute in $Attributes) {
     if ($Attribute -match '[\\/:?"<>|]') {
-        Write-Error "Attribute '$Attribute' contains invalid characters. Please use valid characters."
+        Write-Host "Attribute '$Attribute' contains invalid characters. Please use valid characters."
         exit
     }
 }
@@ -78,5 +78,5 @@ try {
         $UserInfo | Format-List
     }
 } catch {
-    Write-Error "Failed to retrieve information for user: $AccountName. Error: $_"
+    Write-Host "Failed to retrieve information for user: $AccountName. Error: $_"
 }

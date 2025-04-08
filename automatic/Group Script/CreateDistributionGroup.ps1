@@ -52,11 +52,11 @@ try {
     # Verify that the organizational unit exists
     $OUExists = Get-ADOrganizationalUnit -Identity $OrganizationalUnit -ErrorAction Stop
     if (-not $OUExists) {
-        Write-Error "Organizational unit '$OrganizationalUnit' does not exist. Operation aborted."
+        Write-Host "Organizational unit '$OrganizationalUnit' does not exist. Operation aborted."
         return
     }
     New-ADGroup -Name $GroupName -Path $OrganizationalUnit -GroupScope $GroupScope -Description $Description
     Write-Host "Group '$GroupName' created successfully."
 } catch {
-    Write-Error "Failed to create the group. Error: $_"
+    Write-Host "Failed to create the group. Error: $_"
 }

@@ -54,5 +54,5 @@ try {
     Set-ADUser -Identity $AccountName -Replace @{$AttributeName = $DesiredValue}
     Write-Host "Attribute '$AttributeName' successfully updated to '$DesiredValue' for user: $AccountName."
 } catch {
-    Write-Error "Failed to modify attribute '$AttributeName' for user: $AccountName. Error: $_"
+    Write-Host "Failed to modify attribute '$AttributeName' for user: $AccountName. Error: $_"
 }

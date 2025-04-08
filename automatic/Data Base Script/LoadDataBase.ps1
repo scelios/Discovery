@@ -185,7 +185,7 @@ try {
         }
     }
 } catch {
-    Write-Error "Failed to load the database. Error: $_"
+    Write-Host "Failed to load the database. Error: $_"
     return
 }
 

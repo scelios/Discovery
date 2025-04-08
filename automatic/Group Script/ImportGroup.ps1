@@ -44,14 +44,14 @@ try {
     # Verify that the origin group exists
     $OriginGroup = Get-ADGroup -Identity $OriginGroupName -Properties Members -ErrorAction Stop
     if (-not $OriginGroup) {
-        Write-Error "Origin group '$OriginGroupName' does not exist. Operation aborted."
+        Write-Host "Origin group '$OriginGroupName' does not exist. Operation aborted."
         return
     }
 
     # Verify that the destination group exists
     $DestinationGroup = Get-ADGroup -Identity $DestinationGroupName -ErrorAction Stop
     if (-not $DestinationGroup) {
-        Write-Error "Destination group '$DestinationGroupName' does not exist. Operation aborted."
+        Write-Host "Destination group '$DestinationGroupName' does not exist. Operation aborted."
         return
     }
 
@@ -66,5 +66,5 @@ try {
     Add-ADGroupMember -Identity $DestinationGroupName -Members $OriginMembers
     Write-Host "Successfully imported members from '$OriginGroupName' to '$DestinationGroupName'."
 } catch {
-    Write-Error "Failed to import members. Error: $_"
+    Write-Host "Failed to import members. Error: $_"
 }

@@ -44,7 +44,7 @@ try {
     $Group = Get-ADGroup -Identity $GroupName -Properties * -ErrorAction Stop
 
     if ($null -eq $Group) {
-        Write-Error "Group '$GroupName' does not exist. Operation aborted."
+        Write-Host "Group '$GroupName' does not exist. Operation aborted."
         return
     }
 
@@ -53,12 +53,12 @@ try {
         if ($Group.PSObject.Properties[$PropertyName]) {
             Write-Host "Property '$PropertyName' of group '$GroupName': $($Group.$PropertyName)"
         } else {
-            Write-Error "Property '$PropertyName' does not exist for group '$GroupName'."
+            Write-Host "Property '$PropertyName' does not exist for group '$GroupName'."
         }
     } else {
         Write-Host "All properties of group '$GroupName':"
         $Group | Format-List
     }
 } catch {
-    Write-Error "Failed to retrieve group information. Error: $_"
+    Write-Host "Failed to retrieve group information. Error: $_"
 }

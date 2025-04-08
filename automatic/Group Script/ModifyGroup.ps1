@@ -40,6 +40,14 @@ if (-not $Attribute) {
     Write-Host "No attribute provided. Exiting..."
     exit
 }
+# List of modifiable attributes
+# $ModifiableAttributes = @("Description", "ManagedBy", "DisplayName")
+
+# Check if the attribute is modifiable
+# if ($Attribute -notin $ModifiableAttributes) {
+#     Write-Host "The attribute '$Attribute' cannot be modified. Please choose a valid attribute (e.g., Description, ManagedBy, DisplayName)."
+#     exit
+# }
 
 # Prompt the user for the new value of the attribute
 $NewValue = Get-UserInput -Message "Enter the new value for the attribute (e.g., Updated description for HR team):" -Title "New Value"
@@ -54,5 +62,5 @@ try {
     Set-ADGroup -Identity $GroupName -Replace @{$Attribute = $NewValue}
     Write-Host "Group '$GroupName' updated successfully. Attribute '$Attribute' set to '$NewValue'."
 } catch {
-    Write-Error "Failed to modify the group. Error: $_"
+    Write-Host "Failed to modify the group. Error: $_"
 }

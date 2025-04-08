@@ -46,11 +46,8 @@ try {
             } else {
                 Write-Host "Group: $($Group.Name), Property '$PropertyName' does not exist."
             }
-        } else {
-            Write-Host "All properties for group: $($Group.Name)"
-            $Group | Format-List
         }
     }
 } catch {
-    Write-Error "Failed to retrieve information for all groups. Error: $_"
+    Write-Host "Failed to retrieve information for all groups. Error: $_"
 }

@@ -42,5 +42,5 @@ try {
         Write-Host "The group '$GroupName' has no members."
     }
 } catch {
-    Write-Error "Failed to retrieve members of the group. Error: $_"
+    Write-Host "Failed to retrieve members of the group. Error: $_"
 }

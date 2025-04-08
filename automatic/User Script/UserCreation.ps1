@@ -50,7 +50,7 @@ if (-not $AccountName) {
 # Split the account name into first name and last name
 $NameParts = $AccountName.Split('.')
 if ($NameParts.Count -ne 2) {
-    Write-Error "AccountName must be in the format 'name.surname'."
+    Write-Host "AccountName must be in the format 'name.surname'."
     return
 }
 $FirstName = $NameParts[0]
@@ -58,7 +58,7 @@ $LastName = $NameParts[1]
 
 # Validate FirstName and LastName
 if ($FirstName -match '[\\/:*?"<>|]' -or $LastName -match '[\\/:*?"<>|]') {
-    Write-Error "FirstName or LastName contains invalid characters. Please use valid characters."
+    Write-Host "FirstName or LastName contains invalid characters. Please use valid characters."
     exit
 }
 
@@ -99,7 +99,7 @@ $OrganisationUnit = "OU=$OUname,$DomainDN"
 if (-not (Get-ADOrganizationalUnit -Filter { DistinguishedName -eq $OrganisationUnit })) {
     # Validate the OrganisationUnit DN
     if ($OrganisationUnit -match '[\\/:*?"<>|]') {
-        Write-Error "The group name '$OrganisationUnit' contains invalid characters. Please use a valid name."
+        Write-Host "The group name '$OrganisationUnit' contains invalid characters. Please use a valid name."
         exit
     }
 
@@ -110,7 +110,7 @@ if (-not (Get-ADOrganizationalUnit -Filter { DistinguishedName -eq $Organisation
         $DomainComponents = $Domain -replace '^.*?DC=', 'DC='
         New-ADOrganizationalUnit -Name $OUname -Path $DomainComponents
     } catch {
-        Write-Error "Failed to create Organizational Unit $OUname. Error: $_"
+        Write-Host "Failed to create Organizational Unit $OUname. Error: $_"
         exit
     }
     Write-Host "Organizational Unit $OUname created successfully."
@@ -128,13 +128,13 @@ if (-not $DesiredGroup) {
 if (-not (Get-ADGroup -Filter { Name -eq $DesiredGroup })) {
     # Validate the OrganisationUnit DN
     if (-not (Get-ADOrganizationalUnit -Filter { DistinguishedName -eq $OrganisationUnit })) {
-        Write-Error "The specified Organizational Unit (OU) path '$OrganisationUnit' is invalid. Please provide a valid DN."
+        Write-Host "The specified Organizational Unit (OU) path '$OrganisationUnit' is invalid. Please provide a valid DN."
         exit
     }
 
     # Validate the DesiredGroup name
     if ($DesiredGroup -match '[\\/:*?"<>|]') {
-        Write-Error "The group name '$DesiredGroup' contains invalid characters. Please use a valid name."
+        Write-Host "The group name '$DesiredGroup' contains invalid characters. Please use a valid name."
         exit
     }
 
@@ -144,7 +144,7 @@ if (-not (Get-ADGroup -Filter { Name -eq $DesiredGroup })) {
         # Create the group with default parameters
         New-ADGroup -Name $DesiredGroup -Path $OrganisationUnit -GroupScope Global -GroupCategory Security
     } catch {
-        Write-Error "Failed to create group $DesiredGroup. Error: $_"
+        Write-Host "Failed to create group $DesiredGroup. Error: $_"
         exit
     }
     Write-Host "Group $DesiredGroup created successfully."
@@ -171,5 +171,5 @@ try {
     Add-ADGroupMember -Identity $DesiredGroup -Members $AccountName
     Write-Host "User $AccountName added to group $DesiredGroup successfully."
 } catch {
-    Write-Error "Failed to create user or add to group. Error: $_"
+    Write-Host "Failed to create user or add to group. Error: $_"
 }
