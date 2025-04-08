@@ -91,8 +91,8 @@ if (-not $OUname) {
 }
 
 # Construct the full DN for the OU
-$dn = Get-ADUser -Identity 'Administrator' | Select-Object -ExpandProperty DistinguishedName
-$DomainDN = $DN.Substring($dn.IndexOf("DC="))
+$Domain = (Get-ADDomain).DistinguishedName
+$DomainDN = $Domain -replace '^.*?DC=', 'DC='
 $OrganisationUnit = "OU=$OUname,$DomainDN"
 
 # Check if the OU exists
@@ -106,7 +106,9 @@ if (-not (Get-ADOrganizationalUnit -Filter { DistinguishedName -eq $Organisation
     # Create the OU if it doesn't exist
     try {
         Write-Host "Organizational Unit $OrganisationUnit does not exist. Creating it..."
-        New-ADOrganizationalUnit -Name $OUname -Path $DomainDN
+        $Domain = (Get-ADDomain).DistinguishedName
+        $DomainComponents = $Domain -replace '^.*?DC=', 'DC='
+        New-ADOrganizationalUnit -Name $OUname -Path $DomainComponents
     } catch {
         Write-Error "Failed to create Organizational Unit $OUname. Error: $_"
         exit

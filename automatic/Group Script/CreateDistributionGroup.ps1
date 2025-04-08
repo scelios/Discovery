@@ -1,6 +1,12 @@
 <#
 .SYNOPSIS
-Creates a new distribution group for sending emails to multiple users at once.
+Creates a new Active Directory group.
+
+.DESCRIPTION
+This script creates a new Active Directory group with the specified name, organizational unit, group scope, and description.
+
+.EXAMPLE
+CreateGroup.ps1
 #>
 
 Add-Type -AssemblyName Microsoft.VisualBasic
@@ -15,9 +21,9 @@ function Get-UserInput {
 }
 
 # Prompt the user for the group name
-$GroupName = Get-UserInput -Message "Enter the name of the distribution group (e.g., Marketing Team):" -Title "Group Name"
+$GroupName = Get-UserInput -Message "Enter the name of the distribution group to create (e.g., HR Team):" -Title "Group Name"
 if (-not $GroupName) {
-    Write-Host "No group name provided. Exiting..."
+    Write-Host "No distribution group name provided. Exiting..."
     exit
 }
 
@@ -28,21 +34,29 @@ if (-not $OrganizationalUnit) {
     exit
 }
 
+$DomainComponents = (Get-ADDomain).DistinguishedName -replace '^.*?DC=', 'DC='
+$OrganizationalUnit = "OU=$OrganizationalUnit,$DomainComponents"
 # Prompt the user for the group scope
 $GroupScope = Get-UserInput -Message "Enter the group scope (Global, Universal, or DomainLocal):" -Title "Group Scope"
-if (-not $GroupScope) {
-    Write-Host "No group scope provided. Exiting..."
+if (-not $GroupScope -or ($GroupScope -notin @("Global", "Universal", "DomainLocal"))) {
+    Write-Host "Invalid or no group scope provided. Exiting..."
     exit
 }
 
 # Prompt the user for the description (optional)
 $Description = Get-UserInput -Message "Enter a description for the group (optional):" -Title "Group Description"
 
-# Create the new distribution group
-Write-Host "Creating a new distribution group: $GroupName..."
+# Create the new group
+Write-Host "Creating a new group: $GroupName..."
 try {
-    New-ADGroup -Name $GroupName -Path $OrganizationalUnit -GroupScope $GroupScope -GroupCategory Distribution -Description $Description
-    Write-Host "Distribution group '$GroupName' created successfully."
+    # Verify that the organizational unit exists
+    $OUExists = Get-ADOrganizationalUnit -Identity $OrganizationalUnit -ErrorAction Stop
+    if (-not $OUExists) {
+        Write-Error "Organizational unit '$OrganizationalUnit' does not exist. Operation aborted."
+        return
+    }
+    New-ADGroup -Name $GroupName -Path $OrganizationalUnit -GroupScope $GroupScope -Description $Description
+    Write-Host "Group '$GroupName' created successfully."
 } catch {
-    Write-Error "Failed to create the distribution group. Error: $_"
+    Write-Error "Failed to create the group. Error: $_"
 }
