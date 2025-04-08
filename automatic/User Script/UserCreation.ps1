@@ -21,7 +21,12 @@ The name of the group to which the user will be added.
 UserCreation.ps1 -AccountName "john.doe" -OrganisationUnit "OU=Users,DC=example,DC=com" -DesiredGroup "IT"
 #>
 
-
+param(
+    [bool]$NoPopup = $false,
+    [string]$AccountName,
+    [string]$OUname,
+    [string]$DesiredGroup
+)
 
 function Get-UserInput {
     param (
@@ -32,7 +37,9 @@ function Get-UserInput {
 }
 
 # Prompt the user for the account name
-$AccountName = Get-UserInput -Message "Enter the account name in the format 'name.surname' (e.g., john.doe):" -Title "Account Name"
+if (!$NoPopup) {
+    $AccountName = Get-UserInput -Message "Enter the account name in the format 'name.surname' (e.g., john.doe):" -Title "Account Name"
+}
 if (-not $AccountName) {
     Write-Host "No account name provided. Exiting..."
     exit
@@ -60,7 +67,8 @@ $FirstName = $FirstName.Trim()
 $LastName = $LastName.Trim()
 
 # Construct the email address and UserPrincipalName
-$DomainName = "example.com" # Replace with your actual domain name
+
+$DomainName = Get-WmiObject -Namespace root\cimv2 -Class Win32_ComputerSystem | Select -expand Domain
 $EmailAddress = "$AccountName@$DomainName"
 $UserPrincipalName = $EmailAddress
 
@@ -74,7 +82,9 @@ if (Get-ADUser -Filter { SamAccountName -eq $AccountName }) {
 }
 
 # Prompt the user for the organizational unit
-$OUname = Get-UserInput -Message "Enter the distinguished name (DN) of the Organizational Unit (OU) where the user will be created (e.g., OU=Users,DC=example,DC=com):" -Title "Organizational Unit"
+if (!$NoPopup) {
+    $OUname = Get-UserInput -Message "Enter the distinguished name (DN) of the Organizational Unit (OU) where the user will be created (e.g., OU=Users):" -Title "Organizational Unit"
+}
 if (-not $OUname) {
     Write-Host "No organizational unit provided. Exiting..."
     exit
@@ -107,7 +117,9 @@ if (-not (Get-ADOrganizationalUnit -Filter { DistinguishedName -eq $Organisation
 }
 
 # Prompt the user for the desired group
-$DesiredGroup = Get-UserInput -Message "Enter the name of the group to which the user will be added (e.g., IT):" -Title "Desired Group"
+if (!$NoPopup) {
+    $DesiredGroup = Get-UserInput -Message "Enter the name of the group to which the user will be added (e.g., IT):" -Title "Desired Group"
+}
 if (-not $DesiredGroup) {
     Write-Host "No group name provided. Exiting..."
     exit
