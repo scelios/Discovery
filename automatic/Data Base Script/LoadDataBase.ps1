@@ -12,6 +12,7 @@ LoadDataBase.ps1
 #>
 
 Add-Type -AssemblyName Microsoft.VisualBasic
+Add-Type -AssemblyName System.Windows.Forms
 
 # Function to display a pop-up and get user input
 function Get-UserInput {
@@ -22,42 +23,44 @@ function Get-UserInput {
     [Microsoft.VisualBasic.Interaction]::InputBox($Message, $Title, "")
 }
 
-# Prompt the user for the file path
-# Put the current path in the input box
-$CurrentPath = Get-Location
-$DefaultFilePath = Join-Path -Path $CurrentPath.Path -ChildPath "ADData.csv"
+# Function to display a Save File dialog and get the file path
+function Get-OpenFilePath {
+    $OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog
+    $OpenFileDialog.InitialDirectory = (Get-Location).Path
+    $OpenFileDialog.Filter = "CSV files (*.csv)|*.csv"
+    $OpenFileDialog.Title = "Select the CSV file to load"
+    $OpenFileDialog.FileName = ""
 
-# Prompt the user for the file path with the current path as the default value
-$FilePath = [Microsoft.VisualBasic.Interaction]::InputBox(
-    "Enter the full path where the CSV file will be saved (e.g., C:\ADData.csv):",
-    "CSV File Path",
-    $DefaultFilePath
-)
-
-if (-not (Get-Command Get-ADGroup -ErrorAction SilentlyContinue)) {
-    Write-Host "The Active Directory module is not available. Please install it to run this script."
-    exit
+    if ($OpenFileDialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
+        Write-Host "Selected file path: $($OpenFileDialog.FileName)"
+        return $OpenFileDialog.FileName
+    } else {
+        Write-Host "No file selected. Exiting..."
+        return $null
+    }
 }
+
+# Prompt the user for the file path using the Save File dialog
+# $FilePath = Get-OpenFilePath
+$FilePath = "C:\Users\Administrator\Documents\Discovery\automatic\Data Base Script\ADData.csv"
 
 if (-not $FilePath) {
     Write-Host "No file path provided. Exiting..."
     exit
 }
 
-# Check if the directory path is valid
-$DirectoryPath = Split-Path -Path $FilePath -Parent
-if (-not (Test-Path -Path $DirectoryPath)) {
-    Write-Host "The specified directory does not exist. Please provide a valid path."
+if (-not (Get-Command Get-ADGroup -ErrorAction SilentlyContinue)) {
+    Write-Host "The Active Directory module is not available. Please install it to run this script."
     exit
 }
-# Check if the file path is writable
-if (-not (Test-Path -Path $DirectoryPath)) {
-    Write-Host "The specified directory does not exist. Please provide a valid path."
+
+if (-not (Test-Path $FilePath)) {
+    Write-Host "The file path '$FilePath' is invalid or does not exist. Exiting..."
     exit
 }
-# Check if the file exists
-if (-not (Test-Path -Path $FilePath)) {
-    Write-Host "The file at path '$FilePath' does not exist. Please provide a valid path."
+
+if (-not $FilePath.EndsWith(".csv")) {
+    Write-Host "The selected file is not a CSV file. Please select a valid CSV file."
     exit
 }
 
@@ -75,7 +78,8 @@ if (-not (Get-Item -Path $FilePath).Attributes -match "ReadOnly") {
 
 
 # Prompt the user for the delimiter
-$Delimiter = Get-UserInput -Message "Enter the delimiter used in the CSV file (e.g., ',' for comma, ';' for semicolon):" -Title "CSV Delimiter"
+# $Delimiter = Get-UserInput -Message "Enter the delimiter used in the CSV file (e.g., ',' for comma, ';' for semicolon):" -Title "CSV Delimiter"
+$Delimiter = ","
 if (-not $Delimiter) {
     Write-Host "No delimiter provided. Exiting..."
     exit
@@ -88,13 +92,98 @@ if ($Delimiter -notmatch "^[,;]$") {
 }
 
 # Load the CSV file
-Write-Host "Loading the database from $FilePath with delimiter '$Delimiter'..."
+Write-Host "Loading the database from $FilePath with delimiter '$Delimiter' ..."
 try {
-    $Database = Import-Csv -Path $FilePath -Delimiter $Delimiter
-    Write-Host "Database successfully loaded."
-    # Output the loaded data
-    Write-Host "Displaying the first 10 entries in the database:"
-    $Database | Select-Object -First 10 | Format-Table -AutoSize
+    $Database = Import-Csv -Path $FilePath -Delimiter $Delimiter 
+    # check if path is valid
+    if (-not $Database) {
+        Write-Host "Failed to load the database. Please check the file format and delimiter."
+        exit
+    }
+    # Check if the CSV file has the required columns
+    if (-not ($Database | Get-Member -Name "ObjectClass" -MemberType NoteProperty)) {
+        Write-Host "The CSV file does not contain the required 'ObjectClass' column. Exiting..."
+        exit
+    }
+    if (-not ($Database | Get-Member -Name "CN" -MemberType NoteProperty)) {
+        Write-Host "The CSV file does not contain the required 'CN' column. Exiting..."
+        exit
+    }
+
+    foreach ($Entry in $Database) {
+        # Check if the entry is a user or group based on the 'ObjectClass' column
+        if ($Entry.ObjectClass -eq "user") {
+            if (-not $Entry.PSObject.Properties["CN"] -or -not $Entry.PSObject.Properties["Name"] -or -not $Entry.PSObject.Properties["Description"]  -or -not $($Entry.CN) -or -not $($Entry.Name)) {
+                Write-Host "Skipping entry with missing or invalid parameter."
+                continue
+            }
+            if (-not $Entry.CN) {
+                Write-Host "Skipping entry with missing CN."
+                continue
+            }
+            try {
+                # Use a properly escaped filter
+                $User = Get-ADUser -Filter "SamAccountName -eq '$($Entry.CN)'" -ErrorAction Stop
+                if ($User) {
+                    Write-Host "User $($Entry.CN) already exists. Skipping..."
+                    continue
+                }
+            } catch {
+                Write-Host "Error checking user $($Entry.CN): $_"
+                continue
+            }
+            
+            # Create a new user
+            Write-Host "Creating user: $($Entry.CN)"
+            New-ADUser `
+                -Name $($Entry.CN) `
+                -SamAccountName $($Entry.CN) `
+                -Description $($Entry.Description) `
+                -AccountPassword (ConvertTo-SecureString "DefaultP@ssw0rd" -AsPlainText -Force) `
+                -ChangePasswordAtLogon $true `
+                -Enabled $true
+
+            # Add user to groups
+            if ($Entry.MemberOf) {
+                $Groups = $Entry.MemberOf -split ","
+                foreach ($Group in $Groups) {
+                    if (Get-ADGroup -Filter { Name -eq $Group }) {
+                        Write-Host "Adding user $($Entry.Name) to group $Group"
+                        Add-ADGroupMember -Identity $Group -Members $Entry.Name
+                    } else {
+                        Write-Host "Group $Group does not exist. Skipping..."
+                    }
+                }
+            }
+        } elseif ($Entry.ObjectClass -eq "group") {
+            if (-not $Entry.PSObject.Properties["CN"] -or -not $Entry.PSObject.Properties["Description"] -or -not $($Entry.CN)) {
+                Write-Host "Skipping entry with missing or invalid parameter."
+                continue
+            }
+            if (-not $Entry.CN) {
+                # Write-Host "Skipping entry with missing CN."
+                continue
+            }
+            try {
+                # Use a properly escaped filter
+                $Group = Get-ADGroup -Filter "Name -eq '$($Entry.CN)'" -ErrorAction Stop
+                if ($Group) {
+                    # Write-Host "Group $($Entry.CN) already exists. Skipping..."
+                    continue
+                }
+            } catch {
+                Write-Host "Error checking group $($Entry.CN): $_"
+                continue
+            }
+            # Create a new group
+            Write-Host "Creating group: $($Entry.CN)"
+            New-ADGroup `
+                -Name $($Entry.CN) `
+                -GroupScope Global `
+                -GroupCategory Security `
+                -Description $($Entry.Description)
+        }
+    }
 } catch {
     Write-Error "Failed to load the database. Error: $_"
     return

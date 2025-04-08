@@ -38,19 +38,20 @@ if (-not $GroupName) {
 Write-Host "Adding user '$UserName' to group '$GroupName'..."
 try {
     # Verify that the user exists
-    $User = Get-ADUser -Identity $UserName -ErrorAction Stop
+    $User = Get-ADUser -Filter "SamAccountName -eq '$($UserName)'" -ErrorAction Stop
     if (-not $User) {
         Write-Error "User '$UserName' does not exist. Operation aborted."
         return
     }
+    Write-Host "User '$UserName' exists."
 
     # Verify that the group exists
-    $Group = Get-ADGroup -Identity $GroupName -ErrorAction Stop
+    $Group = Get-ADGroup -Filter "Name -eq '$($GroupName)'" -ErrorAction Stop
     if (-not $Group) {
         Write-Error "Group '$GroupName' does not exist. Operation aborted."
         return
     }
-
+    Write-Host "Group '$GroupName' exists."
     # Add the user to the group
     Add-ADGroupMember -Identity $GroupName -Members $UserName
     Write-Host "User '$UserName' successfully added to group '$GroupName'."

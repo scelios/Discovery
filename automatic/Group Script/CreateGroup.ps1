@@ -34,6 +34,8 @@ if (-not $OrganizationalUnit) {
     exit
 }
 
+$DomainComponents = (Get-ADDomain).DistinguishedName -replace '^.*?DC=', 'DC='
+$OrganizationalUnit = "OU=$OrganizationalUnit,$DomainComponents"
 # Prompt the user for the group scope
 $GroupScope = Get-UserInput -Message "Enter the group scope (Global, Universal, or DomainLocal):" -Title "Group Scope"
 if (-not $GroupScope -or ($GroupScope -notin @("Global", "Universal", "DomainLocal"))) {
@@ -47,6 +49,12 @@ $Description = Get-UserInput -Message "Enter a description for the group (option
 # Create the new group
 Write-Host "Creating a new group: $GroupName..."
 try {
+    # Verify that the organizational unit exists
+    $OUExists = Get-ADOrganizationalUnit -Identity $OrganizationalUnit -ErrorAction Stop
+    if (-not $OUExists) {
+        Write-Error "Organizational unit '$OrganizationalUnit' does not exist. Operation aborted."
+        return
+    }
     New-ADGroup -Name $GroupName -Path $OrganizationalUnit -GroupScope $GroupScope -Description $Description
     Write-Host "Group '$GroupName' created successfully."
 } catch {
