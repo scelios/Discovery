@@ -52,6 +52,10 @@ if (-not $AttributesInput) {
     Write-Host "No attributes provided. Retrieving all properties..."
     $Attributes = "*"
 } else {
+    # Check if ?ame is not inside the attributes
+    if (-not $Attributes -contains "Name") {
+        $AttributesInput = "Name," + $AttributesInput
+    }
     $Attributes = $AttributesInput -split ","
 }
 # Validate the attributes
@@ -67,10 +71,9 @@ Write-Host "Retrieving information for user: $AccountName..."
 try {
     if ($Attributes -ne "*") {
         # Ensure no duplicate properties in the selection
-        $UniqueAttributes = $Attributes | Where-Object { $_ -ne "SamAccountName" }
-        $UserInfo = Get-ADUser -Identity $AccountName -Properties $Attributes
-        Write-Host "Retrieved the following attributes for user $AccountName :"
-        $UserInfo | Select-Object SamAccountName, $UniqueAttributes | Format-Table -AutoSize
+        $AttributesArray = $Attributes
+        $Users = Get-ADUser -Identity $AccountName -Properties $AttributesArray -ErrorAction Stop
+        $Users | Select-Object -Property $AttributesArray | Format-Table -AutoSize
     } else {
         # Retrieve all attributes
         $UserInfo = Get-ADUser -Identity $AccountName -Properties *

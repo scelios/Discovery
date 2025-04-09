@@ -15,6 +15,8 @@ The name of the group from which the user will be removed.
 RemoveUserToGroup.ps1 -UserName "jdoe" -GroupName "HR Team"
 #>
 
+Add-Type -AssemblyName Microsoft.VisualBasic
+
 function Get-UserInput {
     param (
         [string]$Message,

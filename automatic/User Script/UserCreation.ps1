@@ -20,13 +20,13 @@ The name of the group to which the user will be added.
 .EXAMPLE
 UserCreation.ps1 -AccountName "john.doe" -OrganisationUnit "OU=Users,DC=example,DC=com" -DesiredGroup "IT"
 #>
-
 param(
     [bool]$NoPopup = $false,
     [string]$AccountName,
     [string]$OUname,
     [string]$DesiredGroup
 )
+Add-Type -AssemblyName Microsoft.VisualBasic
 
 function Get-UserInput {
     param (
@@ -105,10 +105,15 @@ if (-not (Get-ADOrganizationalUnit -Filter { DistinguishedName -eq $Organisation
 
     # Create the OU if it doesn't exist
     try {
-        Write-Host "Organizational Unit $OrganisationUnit does not exist. Creating it..."
-        $Domain = (Get-ADDomain).DistinguishedName
-        $DomainComponents = $Domain -replace '^.*?DC=', 'DC='
-        New-ADOrganizationalUnit -Name $OUname -Path $DomainComponents
+        if (Get-ADOrganizationalUnit -Filter "distinguishedName -eq '$OUname'") {
+            Write-Host "$newOU already exists."
+        } else {
+            Write-Host "Organizational Unit $OrganisationUnit does not exist. Creating it..."
+            New-ADOrganizationalUnit -Name $OUname -Path $DomainDN
+        }
+        # $Domain = (Get-ADDomain).DistinguishedName
+        # $DomainComponents = $Domain -replace '^.*?DC=', 'DC='
+        # New-ADOrganizationalUnit -Name $OUname -Path $DomainComponents
     } catch {
         Write-Host "Failed to create Organizational Unit $OUname. Error: $_"
         exit

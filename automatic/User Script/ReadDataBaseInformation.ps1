@@ -40,13 +40,14 @@ if (-not $AttributesInput) {
     Write-Host "No attributes provided. Retrieving all properties..."
     $Attributes = "*"
 } else {
+        if (-not $Attributes -contains "Name") {
+        $AttributesInput = "Name," + $AttributesInput
+    }
     $Attributes = $AttributesInput -split ","
 }
 
 # Retrieve all users' information
 Write-Host "Retrieving information for all users..."
-Write-Host "Account Name: $AccountName"
-Write-Host "Attributes: $Attributes"
 try {
     if ($Attributes -eq "*" -and $AccountName -eq "*") {
         # Retrieve all properties
@@ -55,8 +56,12 @@ try {
     } else {
         # Ensure $Attributes is an array
         $AttributesArray = $Attributes
-        $Users = Get-ADUser -Filter * -Properties $AttributesArray -ErrorAction Stop
-        $Users | Select-Object SamAccountName, $AttributesArray | Format-Table -AutoSize
+        if ($AccountName -ne "*") {
+            $Users = Get-ADUser -Identity $AccountName -Properties $AttributesArray -ErrorAction Stop
+        } else {
+            $Users = Get-ADUser -Filter * -Properties $AttributesArray -ErrorAction Stop
+        }
+        $Users | Select-Object -Property $AttributesArray | Format-Table -AutoSize
     }
 } catch {
     Write-Host "Failed to retrieve information for all users. Error: $_"

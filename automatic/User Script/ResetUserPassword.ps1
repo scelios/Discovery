@@ -22,7 +22,7 @@ if (-not $AccountName) {
 }
 
 # Define the new password securely
-$NewPassword = ConvertTo-SecureString "N3wP@ssw0rd!" -AsPlainText -Force # Replace with a secure password
+$NewPassword = ConvertTo-SecureString "P@ssw0rd" -AsPlainText -Force # Replace with a secure password
 
 # Reset the user's password
 Write-Host "Resetting password for user: $AccountName..."
