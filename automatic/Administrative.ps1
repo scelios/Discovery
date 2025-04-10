@@ -152,7 +152,7 @@ $DeletePermissions = @{
     "Administrator" = @("C:\WorkPlan", "C:\Management", "E:\HumanResources", "E:\Estimate", "E:\Client")
 }
 
-if (1){
+if (0){
     try {
         foreach ($GroupName in $GroupNames) {
             Write-Host "Setting permissions for group '$GroupName'..."
@@ -227,7 +227,7 @@ if (1){
     }
 }
 
-if (0){
+if (1){
     # Set the screen as the desktop background for all users
     try {
         $screen = "\\" + $ComputerName + "\Shared\Screen.png"
