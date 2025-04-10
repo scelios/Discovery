@@ -18,6 +18,12 @@ The new value to set for the specified attribute.
 .EXAMPLE
 EditUserAttribute.ps1 -AccountName "john.doe" -AttributeName "Title" -DesiredValue "Manager"
 #>
+param (
+    [bool]$NoPopup = $false,
+    [string]$AccountName,
+    [string]$AttributeName,
+    [string]$DesiredValue
+)
 
 function Get-UserInput {
     param (
@@ -28,21 +34,27 @@ function Get-UserInput {
 }
 
 # Prompt the user for the account name
-$AccountName = Get-UserInput -Message "Enter the account name (SamAccountName) of the user whose attribute will be modified (e.g., john.doe):" -Title "Account Name"
+if (!$NoPopup) {
+    $AccountName = Get-UserInput -Message "Enter the account name (SamAccountName) of the user whose attribute will be modified (e.g., john.doe):" -Title "Account Name"
+}
 if (-not $AccountName) {
     Write-Host "No account name provided. Exiting..."
     exit
 }
 
 # Prompt the user for the attribute name
-$AttributeName = Get-UserInput -Message "Enter the name of the attribute to modify (e.g., Title):" -Title "Attribute Name"
+if (!$NoPopup) {
+    $AttributeName = Get-UserInput -Message "Enter the name of the attribute to modify (e.g., Title):" -Title "Attribute Name"
+}
 if (-not $AttributeName) {
     Write-Host "No attribute name provided. Exiting..."
     exit
 }
 
 # Prompt the user for the desired value
-$DesiredValue = Get-UserInput -Message "Enter the new value for the attribute (e.g., Manager):" -Title "Desired Value"
+if (!$NoPopup) {
+    $DesiredValue = Get-UserInput -Message "Enter the new value for the attribute (e.g., Manager):" -Title "Desired Value"
+}
 if (-not $DesiredValue) {
     Write-Host "No desired value provided. Exiting..."
     exit

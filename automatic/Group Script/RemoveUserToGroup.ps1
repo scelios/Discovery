@@ -14,6 +14,11 @@ The name of the group from which the user will be removed.
 .EXAMPLE
 RemoveUserToGroup.ps1 -UserName "jdoe" -GroupName "HR Team"
 #>
+param (
+    [bool]$NoPopup = $false,
+    [string]$UserName,
+    [string]$GroupName,
+)
 
 Add-Type -AssemblyName Microsoft.VisualBasic
 
@@ -26,14 +31,18 @@ function Get-UserInput {
 }
 
 # Prompt the user for the username
-$UserName = Get-UserInput -Message "Enter the username (SamAccountName) of the user to remove from the group (e.g., jdoe):" -Title "User Name"
+if (!$NoPopup) {
+    $UserName = Get-UserInput -Message "Enter the username (SamAccountName) of the user to remove from the group (e.g., jdoe):" -Title "User Name"
+}
 if (-not $UserName) {
     Write-Host "No username provided. Exiting..."
     exit
 }
 
 # Prompt the user for the group name
-$GroupName = Get-UserInput -Message "Enter the name of the group from which the user will be removed (e.g., HR Team):" -Title "Group Name"
+if (!$NoPopup) {
+    $GroupName = Get-UserInput -Message "Enter the name of the group from which the user will be removed (e.g., HR Team):" -Title "Group Name"
+}
 if (-not $GroupName) {
     Write-Host "No group name provided. Exiting..."
     exit

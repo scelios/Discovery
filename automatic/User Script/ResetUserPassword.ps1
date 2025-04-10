@@ -2,6 +2,10 @@
 .SYNOPSIS
 Resets the password of the specified Active Directory user.
 #>
+param (
+    [bool]$NoPopup = $false,
+    [string]$AccountName
+)
 
 Add-Type -AssemblyName Microsoft.VisualBasic
 
@@ -15,7 +19,9 @@ function Get-UserInput {
 }
 
 # Prompt the user for the account name
-$AccountName = Get-UserInput -Message "Enter the account name (SamAccountName) of the user whose password will be reset (e.g., john.doe):" -Title "Account Name"
+if (!$NoPopup) {
+    $AccountName = Get-UserInput -Message "Enter the account name (SamAccountName) of the user whose password will be reset (e.g., john.doe):" -Title "Account Name"
+}
 if (-not $AccountName) {
     Write-Host "No account name provided. Exiting..."
     exit

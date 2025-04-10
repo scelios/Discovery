@@ -11,6 +11,11 @@ the file path and the delimiter used in the CSV file.
 LoadDataBase.ps1
 #>
 
+param (
+    [bool]$NoPopup = $false,
+    [string]$Delimiter = ","
+)
+
 Add-Type -AssemblyName Microsoft.VisualBasic
 Add-Type -AssemblyName System.Windows.Forms
 
@@ -78,8 +83,9 @@ if (-not (Get-Item -Path $FilePath).Attributes -match "ReadOnly") {
 
 
 # Prompt the user for the delimiter
-# $Delimiter = Get-UserInput -Message "Enter the delimiter used in the CSV file (e.g., ',' for comma, ';' for semicolon):" -Title "CSV Delimiter"
-$Delimiter = ","
+if (!$NoPopup) {
+    $Delimiter = Get-UserInput -Message "Enter the delimiter used in the CSV file (e.g., ',' for comma, ';' for semicolon):" -Title "CSV Delimiter"
+}
 if (-not $Delimiter) {
     Write-Host "No delimiter provided. Exiting..."
     exit

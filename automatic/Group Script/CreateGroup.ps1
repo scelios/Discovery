@@ -72,6 +72,7 @@ if (!$NoPopup) {
 
 # Create the new group
 Write-Host "Creating a new group: $GroupName..."
+
 try {
     # Verify that the organizational unit exists
     $OUExists = Get-ADOrganizationalUnit -Identity $OrganizationalUnit -ErrorAction Stop

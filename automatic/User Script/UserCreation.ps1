@@ -20,7 +20,7 @@ The name of the group to which the user will be added.
 .EXAMPLE
 UserCreation.ps1 -AccountName "john.doe" -OrganisationUnit "OU=Users,DC=example,DC=com" -DesiredGroup "IT"
 #>
-param(
+param (
     [bool]$NoPopup = $false,
     [string]$AccountName,
     [string]$OUname,

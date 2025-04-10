@@ -17,7 +17,12 @@ The new value to set for the specified attribute.
 .EXAMPLE
 ModifyGroup.ps1
 #>
-
+param (
+    [bool]$NoPopup = $false,
+    [string]$GroupName,
+    [string]$Attribute,
+    [string]$NewValue
+)
 
 function Get-UserInput {
     param (
@@ -28,14 +33,18 @@ function Get-UserInput {
 }
 
 # Prompt the user for the group name
-$GroupName = Get-UserInput -Message "Enter the name of the group to modify (e.g., HR Team):" -Title "Group Name"
+if (!$NoPopup) {
+    $GroupName = Get-UserInput -Message "Enter the name of the group to modify (e.g., HR Team):" -Title "Group Name"
+}
 if (-not $GroupName) {
     Write-Host "No group name provided. Exiting..."
     exit
 }
 
 # Prompt the user for the attribute to modify
-$Attribute = Get-UserInput -Message "Enter the attribute of the group to modify (e.g., Description):" -Title "Group Attribute"
+if (!$NoPopup) {
+    $Attribute = Get-UserInput -Message "Enter the attribute of the group to modify (e.g., Description):" -Title "Group Attribute"
+}
 if (-not $Attribute) {
     Write-Host "No attribute provided. Exiting..."
     exit
@@ -50,7 +59,9 @@ if (-not $Attribute) {
 # }
 
 # Prompt the user for the new value of the attribute
-$NewValue = Get-UserInput -Message "Enter the new value for the attribute (e.g., Updated description for HR team):" -Title "New Value"
+if (!$NoPopup) {
+    $NewValue = Get-UserInput -Message "Enter the new value for the attribute (e.g., Updated description for HR team):" -Title "New Value"
+}
 if (-not $NewValue) {
     Write-Host "No new value provided. Exiting..."
     exit

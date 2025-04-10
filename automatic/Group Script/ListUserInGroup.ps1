@@ -12,6 +12,11 @@ The name of the group whose members will be listed.
 ListUserInGroup.ps1 -GroupName "HR Team"
 #>
 
+param (
+    [bool]$NoPopup = $false,
+    [string]$GroupName
+)
+
 Add-Type -AssemblyName Microsoft.VisualBasic
 
 # Function to display a pop-up and get user input
@@ -24,7 +29,9 @@ function Get-UserInput {
 }
 
 # Prompt the user for the group name
-$GroupName = Get-UserInput -Message "Enter the name of the group whose members you want to list (e.g., HR Team):" -Title "Group Name"
+if (!$NoPopup) {
+    $GroupName = Get-UserInput -Message "Enter the name of the group whose members you want to list (e.g., HR Team):" -Title "Group Name"
+}
 if (-not $GroupName) {
     Write-Host "No group name provided. Exiting..."
     exit

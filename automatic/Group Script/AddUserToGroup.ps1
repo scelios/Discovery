@@ -8,6 +8,11 @@ This script adds a user to a specified Active Directory group. It verifies that 
 .EXAMPLE
 AddUserToGroup.ps1
 #>
+param (
+    [bool]$NoPopup = $false,
+    [string]$UserName,
+    [string]$GroupName
+)
 
 Add-Type -AssemblyName Microsoft.VisualBasic
 
@@ -21,14 +26,18 @@ function Get-UserInput {
 }
 
 # Prompt the user for the username
-$UserName = Get-UserInput -Message "Enter the username (SamAccountName) of the user to add to the group (e.g., jdoe):" -Title "User Name"
+if (!$NoPopup) {
+    $UserName = Get-UserInput -Message "Enter the username (SamAccountName) of the user to add to the group (e.g., jdoe):" -Title "User Name"
+}
 if (-not $UserName) {
     Write-Host "No username provided. Exiting..."
     exit
 }
 
 # Prompt the user for the group name
-$GroupName = Get-UserInput -Message "Enter the name of the group to which the user will be added (e.g., HR Team):" -Title "Group Name"
+if (!$NoPopup) {
+    $GroupName = Get-UserInput -Message "Enter the name of the group to which the user will be added (e.g., HR Team):" -Title "Group Name"
+}
 if (-not $GroupName) {
     Write-Host "No group name provided. Exiting..."
     exit
