@@ -64,11 +64,11 @@ try {
         Rename-Computer -NewName $Name -Force
         Write-Host "The server has been successfully renamed to: $Name"
     }
-catch {
+}catch {
         Write-Host "An error occurred while renaming the server: $_"
         exit
-    }
 }
+
 # Configure the server's IP address and DNS settings
 Write-Host "Configuring the server's IP address and DNS settings..."
 
