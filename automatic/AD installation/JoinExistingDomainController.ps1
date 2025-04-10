@@ -14,6 +14,11 @@ The fully qualified domain name (FQDN) of the existing domain (e.g., example.com
 JoinExistingDomainController.ps1
 #>
 
+param (
+    [bool]$NoPopup = $false,
+    [string]$DomainAddress
+)
+
 Add-Type -AssemblyName Microsoft.VisualBasic
 
 # Function to display a pop-up and get user input
@@ -26,7 +31,9 @@ function Get-UserInput {
 }
 
 # Prompt the user for the Domain Address
-$DomainAddress = Get-UserInput -Message "Enter the fully qualified domain name (FQDN) of the existing domain (e.g., example.com):" -Title "Domain Address"
+if (!$NoPopup) {
+    $DomainAddress = Get-UserInput -Message "Enter the fully qualified domain name (FQDN) of the existing domain (e.g., example.com):" -Title "Domain Address"
+}
 if (-not $DomainAddress) {
     Write-Host "No Domain Address provided. Exiting..."
     exit
