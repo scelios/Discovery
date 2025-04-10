@@ -8,7 +8,13 @@ This script creates a new Active Directory group with the specified name, organi
 .EXAMPLE
 CreateGroup.ps1
 #>
-
+param (
+    [bool]$NoPopup = $false,
+    [string]$GroupName,
+    [string]$OrganizationalUnit,
+    [string]$GroupScope,
+    [string]$Description
+)
 Add-Type -AssemblyName Microsoft.VisualBasic
 
 # Function to display a pop-up and get user input
@@ -21,14 +27,18 @@ function Get-UserInput {
 }
 
 # Prompt the user for the group name
-$GroupName = Get-UserInput -Message "Enter the name of the distribution group to create (e.g., HR Team):" -Title "Group Name"
+if (!$NoPopup) {
+    $GroupName = Get-UserInput -Message "Enter the name of the distribution group to create (e.g., HR Team):" -Title "Group Name"
+}
 if (-not $GroupName) {
     Write-Host "No distribution group name provided. Exiting..."
     exit
 }
 
 # Prompt the user for the organizational unit
-$OrganizationalUnit = Get-UserInput -Message "Enter the organizational unit (OU) where the group will be created (e.g., OU=Groups,DC=example,DC=com):" -Title "Organizational Unit"
+if (!$NoPopup) {
+    $OrganizationalUnit = Get-UserInput -Message "Enter the organizational unit (OU) where the group will be created (e.g., OU=Groups,DC=example,DC=com):" -Title "Organizational Unit"
+}
 if (-not $OrganizationalUnit) {
     Write-Host "No organizational unit provided. Exiting..."
     exit
@@ -37,14 +47,18 @@ if (-not $OrganizationalUnit) {
 $DomainComponents = (Get-ADDomain).DistinguishedName -replace '^.*?DC=', 'DC='
 $OrganizationalUnit = "OU=$OrganizationalUnit,$DomainComponents"
 # Prompt the user for the group scope
-$GroupScope = Get-UserInput -Message "Enter the group scope (Global, Universal, or DomainLocal):" -Title "Group Scope"
+if (!$NoPopup) {
+    $GroupScope = Get-UserInput -Message "Enter the group scope (Global, Universal, or DomainLocal):" -Title "Group Scope"
+}
 if (-not $GroupScope -or ($GroupScope -notin @("Global", "Universal", "DomainLocal"))) {
     Write-Host "Invalid or no group scope provided. Exiting..."
     exit
 }
 
 # Prompt the user for the description (optional)
-$Description = Get-UserInput -Message "Enter a description for the group (optional):" -Title "Group Description"
+if (!$NoPopup) {
+    $Description = Get-UserInput -Message "Enter a description for the group (optional):" -Title "Group Description"
+}
 
 # Create the new group
 Write-Host "Creating a new group: $GroupName..."

@@ -15,6 +15,12 @@ The name of the group to which the members will be added.
 ImportGroup.ps1
 #>
 
+param (
+    [bool]$NoPopup = $false,
+    [string]$OriginGroupName,
+    [string]$DestinationGroupName
+)
+
 Add-Type -AssemblyName Microsoft.VisualBasic
 
 # Function to display a pop-up and get user input
@@ -26,14 +32,18 @@ function Get-UserInput {
     [Microsoft.VisualBasic.Interaction]::InputBox($Message, $Title, "")
 }
 # Prompt the user for the origin group name
-$OriginGroupName = Get-UserInput -Message "Enter the name of the origin group (e.g., HR Team):" -Title "Origin Group Name"
+if (!$NoPopup) {
+    $OriginGroupName = Get-UserInput -Message "Enter the name of the origin group (e.g., HR Team):" -Title "Origin Group Name"
+}
 if (-not $OriginGroupName) {
     Write-Host "No origin group name provided. Exiting..."
     exit
 }
 
 # Prompt the user for the destination group name
-$DestinationGroupName = Get-UserInput -Message "Enter the name of the destination group (e.g., All Employees):" -Title "Destination Group Name"
+if (!$NoPopup) {
+    $DestinationGroupName = Get-UserInput -Message "Enter the name of the destination group (e.g., All Employees):" -Title "Destination Group Name"
+}
 if (-not $DestinationGroupName) {
     Write-Host "No destination group name provided. Exiting..."
     exit

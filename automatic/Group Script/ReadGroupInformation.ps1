@@ -17,7 +17,11 @@ ReadGroupInformation.ps1 -GroupName "HR Team"
 .EXAMPLE
 ReadGroupInformation.ps1
 #>
-
+param (
+    [bool]$NoPopup = $false
+    [string]$GroupName,
+    [string]$PropertyName
+)
 
 function Get-UserInput {
     param (
@@ -28,14 +32,18 @@ function Get-UserInput {
 }
 
 # Prompt the user for the group name
-$GroupName = Get-UserInput -Message "Enter the name of the group whose information you want to retrieve (e.g., HR Team):" -Title "Group Name"
+if (!$NoPopup) {
+    $GroupName = Get-UserInput -Message "Enter the name of the group whose information you want to retrieve (e.g., HR Team):" -Title "Group Name"
+}
 if (-not $GroupName) {
     Write-Host "No group name provided. Exiting..."
     exit
 }
 
 # Prompt the user for the property name (optional)
-$PropertyName = Get-UserInput -Message "Enter the property name to retrieve for the group (e.g., Description), or leave blank to retrieve all properties:" -Title "Property Name"
+if (!$NoPopup) {
+    $PropertyName = Get-UserInput -Message "Enter the property name to retrieve for the group (e.g., Description), or leave blank to retrieve all properties:" -Title "Property Name"
+}
 
 # Retrieve group information
 Write-Host "Retrieving information for group '$GroupName'..."

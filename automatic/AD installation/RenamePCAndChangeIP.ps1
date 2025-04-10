@@ -8,6 +8,12 @@ This script renames the server and configures its IP address and DNS settings.
 .EXAMPLE
 RenamePCAndChangeIP.ps1
 #>
+param (
+    [bool]$NoPopup = $false,
+    [string]$Name,
+    [string]$ServerIP,
+    [string]$DomainIP
+)
 
 Add-Type -AssemblyName Microsoft.VisualBasic
 
@@ -21,20 +27,27 @@ function Get-UserInput {
 }
 
 # Prompt the user for the new server name
-$Name = Get-UserInput -Message "Enter the new name for the server (e.g., NewServerName):" -Title "Server Name"
+if (!$NoPopup) {
+    $Name = Get-UserInput -Message "Enter the new name for the server (e.g., NewServerName):" -Title "Server Name"
+}
 if (-not $Name) {
     Write-Host "No server name provided. Exiting..."
     exit
 }
 
 # Prompt the user for the new server IP address
-$ServerIP = Get-UserInput -Message "Enter the new IP address for the server (e.g., 192.168.1.11):" -Title "Server IP Address"
+if (!$NoPopup) {
+    $ServerIP = Get-UserInput -Message "Enter the new IP address for the server (e.g., 192.168.1.11):" -Title "Server IP Address"
+}
 if (-not $ServerIP) {
     Write-Host "No server IP address provided. Exiting..."
     exit
 }
 
 # Prompt the user for the preferred DNS server IP address
+if (!$NoPopup) {
+    
+}
 $DomainIP = Get-UserInput -Message "Enter the preferred DNS server IP address (e.g., 192.168.1.10):" -Title "DNS Server IP Address"
 if (-not $DomainIP) {
     Write-Host "No DNS server IP address provided. Exiting..."

@@ -10,6 +10,12 @@ additional properties to include in the database.
 .EXAMPLE
 SaveDataBase.ps1
 #>
+param(
+    [bool]$NoPopup = $false,
+    [string]$Delimiter,
+    [string]$PropertiesInput
+
+)
 
 Add-Type -AssemblyName Microsoft.VisualBasic
 Import-Module ActiveDirectory
@@ -70,7 +76,9 @@ if (-not (Test-Path -Path $DirectoryPath)) {
 }
 
 # Prompt the user for the delimiter
-$Delimiter = Get-UserInput -Message "Enter the delimiter to use in the CSV file (e.g., ',' for comma, ';' for semicolon):" -Title "CSV Delimiter"
+if (!NoPopup) {
+    $Delimiter = Get-UserInput -Message "Enter the delimiter to use in the CSV file (e.g., ',' for comma, ';' for semicolon):" -Title "CSV Delimiter"
+}
 if (-not $Delimiter) {
     Write-Host "No delimiter provided. Exiting..."
     exit
@@ -84,7 +92,9 @@ if ($Delimiter -notmatch "^[,;]$") {
 }
 
 # Prompt the user for additional properties (optional)
-$PropertiesInput = Get-UserInput -Message "Enter additional properties to include (comma-separated, e.g., Name,EmailAddress,MemberOf), or * all of them:" -Title "Additional Properties"
+if (!$NoPopup) {
+    $PropertiesInput = Get-UserInput -Message "Enter additional properties to include (comma-separated, e.g., Name,EmailAddress,MemberOf), or * all of them:" -Title "Additional Properties"
+}
 if ($PropertiesInput) {
     $Properties = $PropertiesInput -split ","
 } else {

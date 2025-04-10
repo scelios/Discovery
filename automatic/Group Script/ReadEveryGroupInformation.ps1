@@ -14,7 +14,10 @@ ReadEveryGroupInformation.ps1
 .EXAMPLE
 ReadEveryGroupInformation.ps1
 #>
-
+param (
+    [bool]$NoPopup = $false,
+    [string]$PropertyName
+)
 
 function Get-UserInput {
     param (
@@ -25,7 +28,9 @@ function Get-UserInput {
 }
 
 # Prompt the user for the property name (optional)
-$PropertyName = Get-UserInput -Message "Enter the property name to retrieve for each group (e.g., Description), or leave blank to retrieve all properties:" -Title "Property Name"
+if (!$NoPopup) {
+    $PropertyName = Get-UserInput -Message "Enter the property name to retrieve for each group (e.g., Description), or leave blank to retrieve all properties:" -Title "Property Name"
+}
 
 # Retrieve information for all groups
 Write-Host "Retrieving information for all groups in the domain..."

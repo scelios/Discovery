@@ -15,7 +15,11 @@ An optional list of attributes to retrieve. If not specified, all attributes wil
 .EXAMPLE
 ReadUserInformation.ps1 -AccountName "john.doe" -Attributes "Title", "Department"
 #>
-
+param (
+    [bool]$NoPopup = $false,
+    [string]$AccountName,
+    [string]$AttributesInput
+)
 function Get-UserInput {
     param (
         [string]$Message,
@@ -25,7 +29,9 @@ function Get-UserInput {
 }
 
 # Prompt the user for the account name
-$AccountName = Get-UserInput -Message "Enter the account name (SamAccountName) of the user whose information you want to retrieve (e.g., john.doe):" -Title "Account Name"
+if (!$NoPopup) {
+    $AccountName = Get-UserInput -Message "Enter the account name (SamAccountName) of the user whose information you want to retrieve (e.g., john.doe):" -Title "Account Name"
+}
 
 if (-not $AccountName) {
     Write-Host "No account name provided. Exiting..."
@@ -47,7 +53,9 @@ try {
 }
 
 # Prompt the user for the attributes to retrieve (optional)
-$AttributesInput = Get-UserInput -Message "Enter the attribute to retrieve for the user (e.g., Title,Department), or leave blank to retrieve all properties:" -Title "Attributes"
+if (!$NoPopup) {
+    $AttributesInput = Get-UserInput -Message "Enter the attribute to retrieve for the user (e.g., Title,Department), or leave blank to retrieve all properties:" -Title "Attributes"
+}
 if (-not $AttributesInput) {
     Write-Host "No attributes provided. Retrieving all properties..."
     $Attributes = "*"

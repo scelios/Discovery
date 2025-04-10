@@ -11,6 +11,11 @@ The attributes to retrieve for all users.
 .EXAMPLE
 ReadDataBaseInformation.ps1 -Attributes "Title", "Department"
 #>
+param (
+    [bool]$NoPopup = $false,
+    [string]$AccountName,
+    [string]$AttributesInput
+)
 
 function Get-UserInput {
     param (
@@ -21,7 +26,9 @@ function Get-UserInput {
 }
 
 # Prompt the user for AccountName
-$AccountName = Get-UserInput -Message "Enter the account name (SamAccountName) of the user whose information you want to retrieve (e.g., john.doe):" -Title "Account Name"
+if (!$NoPopup) {
+    $AccountName = Get-UserInput -Message "Enter the account name (SamAccountName) of the user whose information you want to retrieve (e.g., john.doe):" -Title "Account Name"
+}
 if (-not $AccountName) {
     Write-Host "No account name provided. Retrieving information for all users..."
     $AccountName = "*"
@@ -35,7 +42,9 @@ if ($AccountName -match '[\\/:?"<>|]') {
 
 
 # Prompt the user for the attributes to retrieve
-$AttributesInput = Get-UserInput -Message "Enter the attributes to retrieve for all users (comma-separated, e.g., Title,Department), or leave blank to retrieve all properties:" -Title "Attributes"
+if (!$NoPopup) {
+    $AttributesInput = Get-UserInput -Message "Enter the attributes to retrieve for all users (comma-separated, e.g., Title,Department), or leave blank to retrieve all properties:" -Title "Attributes"
+}
 if (-not $AttributesInput) {
     Write-Host "No attributes provided. Retrieving all properties..."
     $Attributes = "*"
