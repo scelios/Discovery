@@ -15,13 +15,13 @@ The NetBIOS name for the new forest (e.g., EXAMPLE).
 CreateNewForestDomainController.ps1
 #>
 
-Add-Type -AssemblyName Microsoft.VisualBasic
 
 param(
     [bool]$NoPopup = $false,
     [string]$DomainAddress,
     [string]$NetbiosName
 )
+Add-Type -AssemblyName Microsoft.VisualBasic
 
 # Function to display a pop-up and get user input
 function Get-UserInput {
@@ -31,7 +31,7 @@ function Get-UserInput {
     )
     [Microsoft.VisualBasic.Interaction]::InputBox($Message, $Title, "")
 }
-if (!$PSBoundParameters.ContainsKey('Subject') -or !$PSBoundParameters.ContainsKey('Marks')) {
+# if (!$PSBoundParameters.ContainsKey('Subject') -or !$PSBoundParameters.ContainsKey('Marks')) {
 
 # Prompt the user for the Domain Address
 if (!$NoPopup) {
