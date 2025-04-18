@@ -175,7 +175,7 @@ try {
         -EmailAddress $EmailAddress `
         -Path $OrganisationUnit `
         -AccountPassword $DefaultPassword `
-        -ChangePasswordAtLogon $true `
+        -ChangePasswordAtLogon $false `
         -Enabled $true
 
     Write-Host "User $AccountName created successfully."
