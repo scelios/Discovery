@@ -46,8 +46,8 @@ function Get-OpenFilePath {
 }
 
 # Prompt the user for the file path using the Save File dialog
-# $FilePath = Get-OpenFilePath
-$FilePath = "C:\Users\Administrator\Documents\Discovery\automatic\Data Base Script\ADData.csv"
+$FilePath = Get-OpenFilePath
+# $FilePath = "C:\Users\Administrator\Documents\Discovery\automatic\Data Base Script\ADData.csv"
 
 if (-not $FilePath) {
     Write-Host "No file path provided. Exiting..."

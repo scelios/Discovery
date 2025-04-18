@@ -79,7 +79,12 @@ Write-Host "Retrieving information for user: $AccountName..."
 try {
     if ($Attributes -ne "*") {
         # Ensure no duplicate properties in the selection
-        $AttributesArray = $Attributes
+        $AttributesArray = $Attributes | Sort-Object -Unique
+        if ($AttributesArray -contains "Name") {
+            # Remove the duplicate "Name" property if it already exists
+            $AttributesArray = $AttributesArray | Where-Object { $_ -ne "Name" }
+            $AttributesArray = @("Name") + $AttributesArray
+        }
         $Users = Get-ADUser -Identity $AccountName -Properties $AttributesArray -ErrorAction Stop
         $Users | Select-Object -Property $AttributesArray | Format-Table -AutoSize
     } else {

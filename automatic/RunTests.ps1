@@ -14,7 +14,7 @@ function Write-ColorOutput($ForegroundColor)
     $host.UI.RawUI.ForegroundColor = $fc
 }
 
-Get-ChildItem "C:\Users\Administrator\Documents\Discovery\automatic\Tests\" |
+Get-ChildItem ".\Tests\" |
 Foreach-Object {
     & $_.FullName
     if ($? -eq $true)

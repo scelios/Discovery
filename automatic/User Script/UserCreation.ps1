@@ -73,7 +73,7 @@ $EmailAddress = "$AccountName@$DomainName"
 $UserPrincipalName = $EmailAddress
 
 # Securely define the default password
-$DefaultPassword = ConvertTo-SecureString "TotalyN0tSecure" -AsPlainText -Force
+$DefaultPassword = ConvertTo-SecureString "P@ssw0rd" -AsPlainText -Force
 
 # Check if the user already exists
 if (Get-ADUser -Filter { SamAccountName -eq $AccountName }) {
@@ -95,31 +95,40 @@ $Domain = (Get-ADDomain).DistinguishedName
 $DomainDN = $Domain -replace '^.*?DC=', 'DC='
 $OrganisationUnit = "OU=$OUname,$DomainDN"
 
-# Check if the OU exists
-if (-not (Get-ADOrganizationalUnit -Filter { DistinguishedName -eq $OrganisationUnit })) {
-    # Validate the OrganisationUnit DN
-    if ($OrganisationUnit -match '[\\/:*?"<>|]') {
-        Write-Host "The group name '$OrganisationUnit' contains invalid characters. Please use a valid name."
-        exit
-    }
-
-    # Create the OU if it doesn't exist
+# Check if the OU exists or if it is the default "Users" container
+if ($OUname -ieq "Users") {
+    Write-Host "The specified name 'Users' refers to the default container and cannot be created as an OU."
+    $OrganisationUnit = "CN=Users,$DomainDN"  # Use the default Users container
+} elseif (-not (Get-ADOrganizationalUnit -Filter { DistinguishedName -eq $OrganisationUnit })) {
+    Write-Host "Organizational Unit $OrganisationUnit does not exist. Creating it..."
     try {
-        if (Get-ADOrganizationalUnit -Filter "distinguishedName -eq '$OUname'") {
-            Write-Host "$newOU already exists."
-        } else {
-            Write-Host "Organizational Unit $OrganisationUnit does not exist. Creating it..."
-            New-ADOrganizationalUnit -Name $OUname -Path $DomainDN
-        }
-        # $Domain = (Get-ADDomain).DistinguishedName
-        # $DomainComponents = $Domain -replace '^.*?DC=', 'DC='
-        # New-ADOrganizationalUnit -Name $OUname -Path $DomainComponents
+        New-ADOrganizationalUnit -Name $OUname -Path $DomainDN
+        Write-Host "Organizational Unit $OUname created successfully."
     } catch {
         Write-Host "Failed to create Organizational Unit $OUname. Error: $_"
         exit
     }
-    Write-Host "Organizational Unit $OUname created successfully."
+} else {
+    Write-Host "Organizational Unit $OrganisationUnit already exists."
 }
+
+#     # Create the OU if it doesn't exist
+#     try {
+#         if (Get-ADOrganizationalUnit -Filter "distinguishedName -eq '$OUname'") {
+#             Write-Host "$newOU already exists."
+#         } else {
+#             Write-Host "Organizational Unit $OrganisationUnit does not exist. Creating it..."
+#             New-ADOrganizationalUnit -Name $OUname -Path $DomainDN
+#         }
+#         # $Domain = (Get-ADDomain).DistinguishedName
+#         # $DomainComponents = $Domain -replace '^.*?DC=', 'DC='
+#         # New-ADOrganizationalUnit -Name $OUname -Path $DomainComponents
+#     } catch {
+#         Write-Host "Failed to create Organizational Unit $OUname. Error: $_"
+#         exit
+#     }
+#     Write-Host "Organizational Unit $OUname created successfully."
+# }
 
 # Prompt the user for the desired group
 if (!$NoPopup) {

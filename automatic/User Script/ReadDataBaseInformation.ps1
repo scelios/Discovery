@@ -49,7 +49,7 @@ if (-not $AttributesInput) {
     Write-Host "No attributes provided. Retrieving all properties..."
     $Attributes = "*"
 } else {
-        if (-not $Attributes -contains "Name") {
+        if (-not $Attributes -contains "Name" -and $AttributesInput -ne "*" -and $AttributesInput -ne "name") {
         $AttributesInput = "Name," + $AttributesInput
     }
     $Attributes = $AttributesInput -split ","
@@ -63,13 +63,14 @@ try {
         $Users = Get-ADUser -Filter * -Properties * -ErrorAction Stop
         $Users | Format-Table -AutoSize
     } else {
-        # Ensure $Attributes is an array
-        $AttributesArray = $Attributes
+        # Ensure $Attributes is an array and remove duplicates
+        $AttributesArray = $Attributes | Sort-Object -Unique
         if ($AccountName -ne "*") {
             $Users = Get-ADUser -Identity $AccountName -Properties $AttributesArray -ErrorAction Stop
         } else {
             $Users = Get-ADUser -Filter * -Properties $AttributesArray -ErrorAction Stop
         }
+        # Select only unique properties to avoid conflicts
         $Users | Select-Object -Property $AttributesArray | Format-Table -AutoSize
     }
 } catch {

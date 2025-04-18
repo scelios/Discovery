@@ -76,7 +76,7 @@ if (-not (Test-Path -Path $DirectoryPath)) {
 }
 
 # Prompt the user for the delimiter
-if (!NoPopup) {
+if (!$NoPopup) {
     $Delimiter = Get-UserInput -Message "Enter the delimiter to use in the CSV file (e.g., ',' for comma, ';' for semicolon):" -Title "CSV Delimiter"
 }
 if (-not $Delimiter) {

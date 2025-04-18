@@ -18,7 +18,7 @@ ReadGroupInformation.ps1 -GroupName "HR Team"
 ReadGroupInformation.ps1
 #>
 param (
-    [bool]$NoPopup = $false
+    [bool]$NoPopup = $false,
     [string]$GroupName,
     [string]$PropertyName
 )

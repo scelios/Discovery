@@ -17,7 +17,7 @@ RemoveUserToGroup.ps1 -UserName "jdoe" -GroupName "HR Team"
 param (
     [bool]$NoPopup = $false,
     [string]$UserName,
-    [string]$GroupName,
+    [string]$GroupName
 )
 
 Add-Type -AssemblyName Microsoft.VisualBasic

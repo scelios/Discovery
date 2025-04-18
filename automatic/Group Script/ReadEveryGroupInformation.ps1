@@ -32,6 +32,11 @@ if (!$NoPopup) {
     $PropertyName = Get-UserInput -Message "Enter the property name to retrieve for each group (e.g., Description), or leave blank to retrieve all properties:" -Title "Property Name"
 }
 
+if (-not $PropertyName) {
+    Write-Host "No property name provided. Retrieving all properties for each group."
+} else {
+    Write-Host "Retrieving property '$PropertyName' for each group."
+}
 # Retrieve information for all groups
 Write-Host "Retrieving information for all groups in the domain..."
 try {
@@ -45,7 +50,13 @@ try {
 
     # Retrieve specific property or all properties for each group
     foreach ($Group in $Groups) {
-        if ($PropertyName) {
+        if (-not $PropertyName -or $PropertyName -eq "*") {
+            # If no specific property is provided, print all properties
+            foreach ($Property in $Group.PSObject.Properties) {
+                Write-Host "Group: $($Group.Name), Property '$($Property.Name)': $($Property.Value)"
+            }
+        } else {
+            # If a specific property is provided, check and print it
             if ($Group.PSObject.Properties[$PropertyName]) {
                 Write-Host "Group: $($Group.Name), Property '$PropertyName': $($Group.$PropertyName)"
             } else {
