@@ -2,8 +2,9 @@ $Domain = (Get-ADDomain).DistinguishedName
 $DomainDN = $Domain -replace '^.*?DC=', 'DC='
 $OUnames = @("Administration", "Workspace")
 $ComputerName = $env:COMPUTERNAME
-
-if (0){
+$DomainName = $Domain -replace '^.*?DC=', 'DC='
+$DomainName.toUpper()
+if (1){
     Write-Host "Creating Organizational Units..."
     try {
         foreach ($OUname in $OUnames) {
@@ -22,7 +23,7 @@ $GroupNames = @("Worker", "Direction", "Secretary", "CustomAdministrators")
 $Description = @("Group for workers", "Group for direction", "Group for secretaries", "Group for administrators")
 
 # Create Groups, folders and shares
-if (0){
+if (1){
     Write-Host "Creating Groups..."
     try{
         foreach ($GroupName in $GroupNames) {
@@ -69,7 +70,7 @@ $Users = @(
     @{Name="Admin"; Surname="Williams"; OU="Workspace"; Group="CustomAdministrators"}
 )
 
-if (0){
+if (1){
     foreach ($User in $Users) {
         $UserName = $User.Name
         $UserSurname = $User.Surname
@@ -152,7 +153,7 @@ $DeletePermissions = @{
     "Administrator" = @("C:\WorkPlan", "C:\Management", "E:\HumanResources", "E:\Estimate", "E:\Client")
 }
 
-if (0){
+if (1){
     try {
         foreach ($GroupName in $GroupNames) {
             Write-Host "Setting permissions for group '$GroupName'..."
@@ -249,7 +250,7 @@ if (1){
 # Define OpenOffice program deployement if required by each user
 $OpenOfficePath = "\\" + $ComputerName + "\Shared\OpenOffice 4\program\soffice.exe"
 $OpenOfficeShortcutPath = "\\" + $ComputerName + "\Shared\OpenOffice 4\OpenOffice 4.1.15.lnk"
-if (0) {
+if (1) {
     try {
         if (Test-Path $OpenOfficeShortcutPath) {
             Write-Host "OpenOffice shortcut already exists. Skipping creation."
