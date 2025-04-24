@@ -36,13 +36,13 @@ if (-not $Name) {
 }
 
 # Prompt the user for the new server IP address
-if (!$NoPopup) {
-    $ServerIP = Get-UserInput -Message "Enter the new IP address for the server (e.g., 192.168.1.11):" -Title "Server IP Address"
-}
-if (-not $ServerIP) {
-    Write-Host "No server IP address provided. Exiting..."
-    exit
-}
+# if (!$NoPopup) {
+#     $ServerIP = Get-UserInput -Message "Enter the new IP address for the server (e.g., 192.168.1.11):" -Title "Server IP Address"
+# }
+# if (-not $ServerIP) {
+#     Write-Host "No server IP address provided. Exiting..."
+#     exit
+# }
 
 # Prompt the user for the preferred DNS server IP address
 if (!$NoPopup) {
