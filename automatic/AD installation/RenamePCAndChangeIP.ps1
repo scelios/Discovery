@@ -77,8 +77,8 @@ $existingIP = Get-NetIPAddress -InterfaceAlias "Ethernet" -AddressFamily IPv4 | 
 
 try {
     if ($existingIP) {
-        Write-Host "The IP address $ServerIP already exists. Updating settings..."
-        Set-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress $ServerIP -PrefixLength 24 -DefaultGateway $DomainIP
+        Write-Host "The IP address $ServerIP already exists."
+        #Set-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress $ServerIP -PrefixLength 24 -DefaultGateway $DomainIP
     } else {
         Write-Host "Adding the new IP address $ServerIP..."
         New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress $ServerIP -PrefixLength 24 -DefaultGateway $DomainIP
