@@ -30,6 +30,9 @@ function Get-UserInput {
     [Microsoft.VisualBasic.Interaction]::InputBox($Message, $Title, "")
 }
 
+New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress 192.168.1.11 -PrefixLength 24 -DefaultGateway 192.168.1.1
+Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses 192.168.1.10
+
 # Prompt the user for the Domain Address
 if (!$NoPopup) {
     $DomainAddress = Get-UserInput -Message "Enter the fully qualified domain name (FQDN) of the existing domain (e.g., example.com):" -Title "Domain Address"
