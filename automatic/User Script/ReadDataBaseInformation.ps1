@@ -16,7 +16,7 @@ param (
     [string]$AccountName,
     [string]$AttributesInput
 )
-
+Add-Type -AssemblyName Microsoft.VisualBasic
 function Get-UserInput {
     param (
         [string]$Message,
